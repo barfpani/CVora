@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useResume, ResumeState } from "../../context/resume-state";
 import { getFontClass, TemplateHeader } from "./Templates";
 import {
@@ -10,7 +10,7 @@ import {
   RenderProjects,
   RenderSkills,
   RenderLanguages,
-  RenderCertifications
+  RenderCertifications,
 } from "./Templates";
 import {
   DndContext,
@@ -19,33 +19,70 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  DragEndEvent
+  DragEndEvent,
 } from "@dnd-kit/core";
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
-  useSortable
+  useSortable,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { GripVertical } from "lucide-react";
 
-export default function ResumeSheet() {
+export const RESUME_PAGE_WIDTH = 794;
+export const RESUME_PAGE_HEIGHT = 1123;
+export const RESUME_PAGE_GAP = 28;
+const PAGE_PADDING_X = 52;
+const PAGE_PADDING_Y = 48;
+const HEADER_TO_SECTION_GAP = 20;
+
+interface ResumeSheetProps {
+  onPageCountChange?: (pageCount: number) => void;
+}
+
+export default function ResumeSheet({ onPageCountChange }: ResumeSheetProps) {
   const { state, dispatch } = useResume();
   const { theme, sectionsOrder, visibleSections } = state;
+  const [pages, setPages] = useState<string[][]>([[]]);
+  const [headerHeight, setHeaderHeight] = useState(0);
+  const measurementHeaderRef = useRef<HTMLDivElement | null>(null);
+  const measurementSectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 4, // 4px drag threshold to avoid accidental click-drags
+        distance: 4,
       },
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
+
+  const visibleSectionIds = useMemo(
+    () =>
+      sectionsOrder.filter(
+        (id) => visibleSections[id] !== false && hasSectionContent(id, state)
+      ),
+    [sectionsOrder, state, visibleSections]
+  );
+
+  useLayoutEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      const nextHeaderHeight = measurementHeaderRef.current?.getBoundingClientRect().height ?? 0;
+      const nextPages = buildPages(visibleSectionIds, measurementSectionRefs.current, nextHeaderHeight);
+      setHeaderHeight(nextHeaderHeight);
+      setPages(nextPages);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [state, visibleSectionIds]);
+
+  useEffect(() => {
+    onPageCountChange?.(pages.length || 1);
+  }, [onPageCountChange, pages.length]);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -60,53 +97,94 @@ export default function ResumeSheet() {
     }
   };
 
-  // Filter sections that are toggled on
-  const visibleSectionIds = sectionsOrder.filter(
-    (id) => visibleSections[id] !== false
-  );
-
   const fontClass = getFontClass(theme.font);
+  const headerSpacer = headerHeight > 0 ? headerHeight + HEADER_TO_SECTION_GAP : undefined;
 
   return (
-    <div
-      id="resume-preview-sheet"
-      className={`bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 shadow-xl border border-zinc-200 dark:border-zinc-800 rounded-sm relative selection:bg-blue-100 dark:selection:bg-blue-950/40 select-text ${fontClass} leading-normal overflow-hidden`}
-      style={{
-        /* A4 at 96dpi: 210mm = 794px, 297mm = 1123px */
-        width: "794px",
-        height: "1123px",
-        padding: "48px 52px",
-        boxSizing: "border-box",
-        flexShrink: 0,
-      }}
-    >
-      {/* Header (Not draggable, fixed at top) */}
-      <TemplateHeader state={state} primaryColor={theme.primaryColor} />
+    <>
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed -left-[9999px] top-0 opacity-0"
+      >
+        <div
+          className={`bg-white text-zinc-900 ${fontClass}`}
+          style={{
+            width: `${RESUME_PAGE_WIDTH}px`,
+            padding: `${PAGE_PADDING_Y}px ${PAGE_PADDING_X}px`,
+            boxSizing: "border-box",
+          }}
+        >
+          <div ref={measurementHeaderRef}>
+            <TemplateHeader state={state} primaryColor={theme.primaryColor} />
+          </div>
+          <div className="mt-5 space-y-4">
+            {visibleSectionIds.map((sectionId) => (
+              <div
+                key={`measure-${sectionId}`}
+                ref={(node) => {
+                  measurementSectionRefs.current[sectionId] = node;
+                }}
+              >
+                <SectionBody id={sectionId} state={state} primaryColor={theme.primaryColor} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
 
-      {/* Drag and Drop Sections */}
-      <div className="mt-5 space-y-4">
+      <div id="resume-preview-stack" className="flex flex-col gap-7">
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
           modifiers={[restrictToVerticalAxis]}
           onDragEnd={handleDragEnd}
         >
-          <SortableContext
-            items={visibleSectionIds}
-            strategy={verticalListSortingStrategy}
-          >
-            {visibleSectionIds.map((sectionId) => (
-              <SortableSection
-                key={sectionId}
-                id={sectionId}
-                state={state}
-                primaryColor={theme.primaryColor}
-              />
+          <SortableContext items={visibleSectionIds} strategy={verticalListSortingStrategy}>
+            {pages.map((pageSectionIds, pageIndex) => (
+              <div
+                key={`page-${pageIndex}`}
+                data-resume-page="true"
+                className={`bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 shadow-xl border border-zinc-200 dark:border-zinc-800 rounded-sm relative selection:bg-blue-100 dark:selection:bg-blue-950/40 select-text ${fontClass} leading-normal overflow-hidden`}
+                style={{
+                  width: `${RESUME_PAGE_WIDTH}px`,
+                  minHeight: `${RESUME_PAGE_HEIGHT}px`,
+                  padding: `${PAGE_PADDING_Y}px ${PAGE_PADDING_X}px`,
+                  boxSizing: "border-box",
+                  flexShrink: 0,
+                }}
+              >
+                {pageIndex === 0 ? (
+                  <>
+                    <TemplateHeader state={state} primaryColor={theme.primaryColor} />
+                    <div className="mt-5 space-y-4">
+                      {pageSectionIds.map((sectionId) => (
+                        <SortableSection
+                          key={sectionId}
+                          id={sectionId}
+                          state={state}
+                          primaryColor={theme.primaryColor}
+                        />
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <div className="space-y-4" style={headerSpacer ? { paddingTop: `${headerSpacer}px` } : undefined}>
+                    {pageSectionIds.map((sectionId) => (
+                      <SortableSection
+                        key={sectionId}
+                        id={sectionId}
+                        state={state}
+                        primaryColor={theme.primaryColor}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
             ))}
           </SortableContext>
         </DndContext>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -117,14 +195,7 @@ interface SortableSectionProps {
 }
 
 function SortableSection({ id, state, primaryColor }: SortableSectionProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
 
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
@@ -133,58 +204,12 @@ function SortableSection({ id, state, primaryColor }: SortableSectionProps) {
     zIndex: isDragging ? 50 : "auto",
   };
 
-  const renderSectionContent = () => {
-    switch (id) {
-      case "summary":
-        return <RenderSummary state={state} primaryColor={primaryColor} />;
-      case "workExperience":
-        return <RenderExperience state={state} primaryColor={primaryColor} />;
-      case "education":
-        return <RenderEducation state={state} primaryColor={primaryColor} />;
-      case "projects":
-        return <RenderProjects state={state} primaryColor={primaryColor} />;
-      case "skills":
-        return <RenderSkills state={state} primaryColor={primaryColor} />;
-      case "languages":
-        return <RenderLanguages state={state} primaryColor={primaryColor} />;
-      case "certifications":
-        return <RenderCertifications state={state} primaryColor={primaryColor} />;
-      default:
-        return null;
-    }
-  };
-
-  const hasContent = () => {
-    switch (id) {
-      case "summary":
-        return !!state.summary && state.summary.trim() !== "" && state.summary.trim() !== "<p></p>";
-      case "workExperience":
-        return state.workExperience.some(e => e.company || e.position);
-      case "education":
-        return state.education.some(e => e.school || e.degree);
-      case "projects":
-        return state.projects.some(p => p.name);
-      case "skills":
-        return state.skills.some(s => s.name && s.skills);
-      case "languages":
-        return state.languages.some(l => l.name);
-      case "certifications":
-        return state.certifications.some(c => c.name);
-      default:
-        return false;
-    }
-  };
-
-  // If section has no user input, don't render it (or the drag handle wrapper)
-  if (!hasContent()) return null;
-
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className={`group relative p-2 -mx-2 rounded-lg border border-transparent hover:border-blue-200 dark:hover:border-blue-900/50 hover:bg-blue-50/10 dark:hover:bg-blue-950/5 transition-all duration-150`}
+      className="group relative p-2 -mx-2 rounded-lg border border-transparent hover:border-blue-200 dark:hover:border-blue-900/50 hover:bg-blue-50/10 dark:hover:bg-blue-950/5 transition-all duration-150"
     >
-      {/* Reorder Grip Handle (appears on hover) */}
       <div
         {...attributes}
         {...listeners}
@@ -195,7 +220,86 @@ function SortableSection({ id, state, primaryColor }: SortableSectionProps) {
         <span className="text-[9px] font-bold uppercase tracking-wider text-zinc-500">Reorder</span>
       </div>
 
-      {renderSectionContent()}
+      <SectionBody id={id} state={state} primaryColor={primaryColor} />
     </div>
   );
+}
+
+function SectionBody({ id, state, primaryColor }: SortableSectionProps) {
+  switch (id) {
+    case "summary":
+      return <RenderSummary state={state} primaryColor={primaryColor} />;
+    case "workExperience":
+      return <RenderExperience state={state} primaryColor={primaryColor} />;
+    case "education":
+      return <RenderEducation state={state} primaryColor={primaryColor} />;
+    case "projects":
+      return <RenderProjects state={state} primaryColor={primaryColor} />;
+    case "skills":
+      return <RenderSkills state={state} primaryColor={primaryColor} />;
+    case "languages":
+      return <RenderLanguages state={state} primaryColor={primaryColor} />;
+    case "certifications":
+      return <RenderCertifications state={state} primaryColor={primaryColor} />;
+    default:
+      return null;
+  }
+}
+
+function hasSectionContent(id: string, state: ResumeState) {
+  switch (id) {
+    case "summary":
+      return !!state.summary && state.summary.trim() !== "" && state.summary.trim() !== "<p></p>";
+    case "workExperience":
+      return state.workExperience.some((experience) => experience.company || experience.position);
+    case "education":
+      return state.education.some((education) => education.school || education.degree);
+    case "projects":
+      return state.projects.some((project) => project.name);
+    case "skills":
+      return state.skills.some((skill) => skill.name && skill.skills);
+    case "languages":
+      return state.languages.some((language) => language.name);
+    case "certifications":
+      return state.certifications.some((certification) => certification.name);
+    default:
+      return false;
+  }
+}
+
+function buildPages(
+  visibleSectionIds: string[],
+  sectionRefs: Record<string, HTMLDivElement | null>,
+  measuredHeaderHeight: number
+) {
+  if (visibleSectionIds.length === 0) {
+    return [[]];
+  }
+
+  const firstPageLimit =
+    RESUME_PAGE_HEIGHT - PAGE_PADDING_Y * 2 - measuredHeaderHeight - HEADER_TO_SECTION_GAP;
+  const followingPageLimit = RESUME_PAGE_HEIGHT - PAGE_PADDING_Y * 2;
+
+  const nextPages: string[][] = [[]];
+  let currentPageIndex = 0;
+  let usedHeight = 0;
+
+  visibleSectionIds.forEach((sectionId) => {
+    const sectionHeight = sectionRefs[sectionId]?.getBoundingClientRect().height ?? 0;
+    const pageLimit = currentPageIndex === 0 ? firstPageLimit : followingPageLimit;
+    const gap = nextPages[currentPageIndex].length > 0 ? 16 : 0;
+    const nextHeight = usedHeight + gap + sectionHeight;
+
+    if (nextPages[currentPageIndex].length > 0 && nextHeight > pageLimit) {
+      nextPages.push([sectionId]);
+      currentPageIndex += 1;
+      usedHeight = sectionHeight;
+      return;
+    }
+
+    nextPages[currentPageIndex].push(sectionId);
+    usedHeight = nextHeight;
+  });
+
+  return nextPages;
 }

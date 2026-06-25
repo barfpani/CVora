@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ResumeState, WorkExperience, Education, Project, SkillCategory, Language, Certification } from "../../context/resume-state";
+import { ResumeState, SectionFontKey } from "../../context/resume-state";
 import { Mail, Phone, Globe, MapPin } from "lucide-react";
 
 function Github({ className, style }: { className?: string; style?: React.CSSProperties }) {
@@ -58,6 +58,17 @@ export function getFontClass(font: ResumeState["theme"]["font"]): string {
     default:
       return "font-sans font-inter";
   }
+}
+
+export function getSectionFontClass(state: ResumeState, sectionId: SectionFontKey): string {
+  return getFontClass(state.theme.sectionFonts[sectionId] ?? state.theme.font);
+}
+
+function getSectionTextStyle(state: ResumeState): React.CSSProperties {
+  return {
+    fontSize: `${state.theme.contentFontSize}px`,
+    lineHeight: 1.45,
+  };
 }
 
 // -------------------------------------------------------------
@@ -241,7 +252,7 @@ export function TemplateSectionTitle({ title, primaryColor, template }: { title:
       <div className="mb-3.5 mt-5">
         <h3 className="text-sm font-extrabold text-zinc-900 dark:text-zinc-100 pb-1 border-b-2" style={{ borderColor: `${primaryColor}40` }}>
           <span className="px-2 py-0.5 rounded text-[11px] text-white font-bold mr-2 align-middle" style={{ backgroundColor: primaryColor }}>
-            //
+            {"//"}
           </span>
           {title}
         </h3>
@@ -267,7 +278,7 @@ export function RenderSummary({ state, primaryColor }: SectionProps) {
   if (!summary || summary.trim() === "<p></p>" || summary.trim() === "") return null;
 
   return (
-    <div className="resume-section">
+    <div className={`resume-section ${getSectionFontClass(state, "summary")}`} style={getSectionTextStyle(state)}>
       <TemplateSectionTitle title="Professional Summary" primaryColor={primaryColor} template={theme.template} />
       <RichTextDisplay content={summary} className="text-zinc-700 dark:text-zinc-300" />
     </div>
@@ -280,7 +291,7 @@ export function RenderExperience({ state, primaryColor }: SectionProps) {
   if (activeExps.length === 0) return null;
 
   return (
-    <div className="resume-section">
+    <div className={`resume-section ${getSectionFontClass(state, "workExperience")}`} style={getSectionTextStyle(state)}>
       <TemplateSectionTitle title="Work Experience" primaryColor={primaryColor} template={theme.template} />
       <div className="space-y-4">
         {activeExps.map((exp) => (
@@ -315,7 +326,7 @@ export function RenderEducation({ state, primaryColor }: SectionProps) {
   if (activeEdu.length === 0) return null;
 
   return (
-    <div className="resume-section">
+    <div className={`resume-section ${getSectionFontClass(state, "education")}`} style={getSectionTextStyle(state)}>
       <TemplateSectionTitle title="Education" primaryColor={primaryColor} template={theme.template} />
       <div className="space-y-3">
         {activeEdu.map((edu) => (
@@ -353,7 +364,7 @@ export function RenderProjects({ state, primaryColor }: SectionProps) {
   if (activeProjs.length === 0) return null;
 
   return (
-    <div className="resume-section">
+    <div className={`resume-section ${getSectionFontClass(state, "projects")}`} style={getSectionTextStyle(state)}>
       <TemplateSectionTitle title="Projects" primaryColor={primaryColor} template={theme.template} />
       <div className="space-y-4">
         {activeProjs.map((proj) => (
@@ -393,7 +404,7 @@ export function RenderSkills({ state, primaryColor }: SectionProps) {
   if (activeSkills.length === 0) return null;
 
   return (
-    <div className="resume-section">
+    <div className={`resume-section ${getSectionFontClass(state, "skills")}`} style={getSectionTextStyle(state)}>
       <TemplateSectionTitle title="Skills" primaryColor={primaryColor} template={theme.template} />
       <div className="space-y-2">
         {activeSkills.map((category) => {
@@ -427,7 +438,7 @@ export function RenderLanguages({ state, primaryColor }: SectionProps) {
   if (activeLangs.length === 0) return null;
 
   return (
-    <div className="resume-section">
+    <div className={`resume-section ${getSectionFontClass(state, "languages")}`} style={getSectionTextStyle(state)}>
       <TemplateSectionTitle title="Languages" primaryColor={primaryColor} template={theme.template} />
       <div className="flex flex-wrap gap-x-6 gap-y-2 text-xs">
         {activeLangs.map((lang) => (
@@ -451,7 +462,7 @@ export function RenderCertifications({ state, primaryColor }: SectionProps) {
   if (activeCerts.length === 0) return null;
 
   return (
-    <div className="resume-section">
+    <div className={`resume-section ${getSectionFontClass(state, "certifications")}`} style={getSectionTextStyle(state)}>
       <TemplateSectionTitle title="Certifications & Awards" primaryColor={primaryColor} template={theme.template} />
       <div className="space-y-2">
         {activeCerts.map((cert) => (

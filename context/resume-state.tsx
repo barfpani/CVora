@@ -65,6 +65,19 @@ export interface Certification {
   date: string;
 }
 
+export const SECTION_FONT_KEYS = [
+  "summary",
+  "workExperience",
+  "education",
+  "projects",
+  "skills",
+  "languages",
+  "certifications",
+] as const;
+
+export type SectionFontKey = (typeof SECTION_FONT_KEYS)[number];
+export type ResumeFont = "inter" | "serif" | "mono" | "outfit" | "playfair";
+
 export interface ResumeState {
   personalInfo: PersonalInfo;
   summary: string;
@@ -79,7 +92,10 @@ export interface ResumeState {
   theme: {
     template: 'modern' | 'minimalist' | 'creative' | 'professional';
     primaryColor: string;
-    font: 'inter' | 'serif' | 'mono' | 'outfit' | 'playfair';
+    font: ResumeFont;
+    documentName: string;
+    contentFontSize: number;
+    sectionFonts: Record<SectionFontKey, ResumeFont>;
   };
 }
 
@@ -234,6 +250,17 @@ const INITIAL_STATE: ResumeState = {
     template: "modern",
     primaryColor: "#3b82f6", // default blue
     font: "inter",
+    documentName: "Resume Craft Resume",
+    contentFontSize: 12,
+    sectionFonts: {
+      summary: "inter",
+      workExperience: "inter",
+      education: "inter",
+      projects: "inter",
+      skills: "inter",
+      languages: "inter",
+      certifications: "inter",
+    },
   },
 };
 
@@ -476,7 +503,20 @@ function resumeReducer(state: ResumeState, action: ResumeAction): ResumeState {
         theme: { ...state.theme, ...action.payload },
       };
     case "LOAD_STATE":
-      return action.payload;
+      return {
+        ...INITIAL_STATE,
+        ...action.payload,
+        personalInfo: { ...INITIAL_STATE.personalInfo, ...action.payload.personalInfo },
+        visibleSections: { ...INITIAL_STATE.visibleSections, ...action.payload.visibleSections },
+        theme: {
+          ...INITIAL_STATE.theme,
+          ...action.payload.theme,
+          sectionFonts: {
+            ...INITIAL_STATE.theme.sectionFonts,
+            ...action.payload.theme?.sectionFonts,
+          },
+        },
+      };
     case "RESET_STATE":
       return INITIAL_STATE;
     case "CLEAR_ALL":
@@ -513,6 +553,17 @@ function resumeReducer(state: ResumeState, action: ResumeAction): ResumeState {
           template: "modern",
           primaryColor: "#3b82f6",
           font: "inter",
+          documentName: "Resume Craft Resume",
+          contentFontSize: 12,
+          sectionFonts: {
+            summary: "inter",
+            workExperience: "inter",
+            education: "inter",
+            projects: "inter",
+            skills: "inter",
+            languages: "inter",
+            certifications: "inter",
+          },
         },
       };
     default:
@@ -544,7 +595,10 @@ export function ResumeProvider({ children }: { children: React.ReactNode }) {
     } catch (e) {
       console.error("Failed to load state from localStorage", e);
     }
-    setIsLoaded(true);
+    const frame = requestAnimationFrame(() => {
+      setIsLoaded(true);
+    });
+    return () => cancelAnimationFrame(frame);
   }, []);
 
   // Save to local storage
