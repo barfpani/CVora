@@ -104,7 +104,7 @@ export default function Home() {
               <h1 className="text-xl font-bold tracking-tight bg-gradient-to-r from-zinc-900 to-zinc-700 dark:from-zinc-100 dark:to-zinc-300 bg-clip-text text-transparent">
                 Resume Craft
               </h1>
-              <p className="text-[10px] text-zinc-500 font-medium">Premium PDF Resume Generator</p>
+              <p className="text-[10px] text-zinc-500 font-medium">Free Resume Generator</p>
             </div>
           </div>
 
@@ -215,11 +215,10 @@ export default function Home() {
                     <button
                       key={preset.value}
                       onClick={() => handleThemeChange("primaryColor", preset.value)}
-                      className={`h-6 w-6 rounded-full border transition-all duration-150 relative cursor-pointer ${
-                        isSelected
-                          ? "border-zinc-900 scale-110 dark:border-zinc-100 shadow-md ring-2 ring-blue-500/20"
-                          : "border-transparent hover:scale-105"
-                      }`}
+                      className={`h-6 w-6 rounded-full border transition-all duration-150 relative cursor-pointer ${isSelected
+                        ? "border-zinc-900 scale-110 dark:border-zinc-100 shadow-md ring-2 ring-blue-500/20"
+                        : "border-transparent hover:scale-105"
+                        }`}
                       style={{ backgroundColor: preset.value }}
                       title={preset.name}
                     >
