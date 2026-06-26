@@ -97,7 +97,7 @@ export default function ResumeSheet({ onPageCountChange }: ResumeSheetProps) {
     }
   };
 
-  const fontClass = getFontClass(theme.font);
+  const fontClass = getFontClass(theme.sectionFonts.personalDetails ?? theme.font);
   const headerSpacer = headerHeight > 0 ? headerHeight + HEADER_TO_SECTION_GAP : undefined;
 
   return (

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { SECTION_FONT_KEYS, SectionFontKey, useResume } from "../context/resume-state";
+import { useResume } from "../context/resume-state";
 import { useTheme } from "next-themes";
 import EditorPanel from "../components/editor/Forms";
 import ResumeSheet, {
@@ -18,13 +18,11 @@ import {
   Sun,
   Moon,
   Palette,
-  Type,
   LayoutTemplate,
   ZoomIn,
   ZoomOut,
   FileCheck,
   FileText,
-  TextCursorInput,
 } from "lucide-react";
 
 const COLOR_PRESETS = [
@@ -37,30 +35,12 @@ const COLOR_PRESETS = [
   { name: "Slate", value: "#4b5563" },
 ];
 
-const FONT_OPTIONS = [
-  { name: "Inter (Sans)", value: "inter" },
-  { name: "Outfit (Modern)", value: "outfit" },
-  { name: "Merriweather (Serif)", value: "serif" },
-  { name: "Playfair Display (Elegant)", value: "playfair" },
-  { name: "Roboto Mono (Monospace)", value: "mono" },
-];
-
 const TEMPLATE_OPTIONS = [
   { name: "Modern Sidebar", value: "modern" },
   { name: "Clean Minimalist", value: "minimalist" },
   { name: "Corporate Professional", value: "professional" },
   { name: "Creative Bold", value: "creative" },
 ];
-
-const SECTION_LABELS: Record<SectionFontKey, string> = {
-  summary: "Summary",
-  workExperience: "Experience",
-  education: "Education",
-  projects: "Projects",
-  skills: "Skills",
-  languages: "Languages",
-  certifications: "Certifications",
-};
 
 export default function Home() {
   const { state, dispatch } = useResume();
@@ -110,29 +90,10 @@ export default function Home() {
   };
 
   const handleThemeChange = (
-    field: "template" | "primaryColor" | "font" | "documentName",
+    field: "template" | "primaryColor" | "documentName",
     value: string
   ) => {
     dispatch({ type: "UPDATE_THEME", payload: { [field]: value } });
-  };
-
-  const handleSectionFontChange = (sectionId: SectionFontKey, value: string) => {
-    dispatch({
-      type: "UPDATE_THEME",
-      payload: {
-        sectionFonts: {
-          ...theme.sectionFonts,
-          [sectionId]: value as typeof theme.font,
-        },
-      },
-    });
-  };
-
-  const handleContentFontSizeChange = (value: number) => {
-    dispatch({
-      type: "UPDATE_THEME",
-      payload: { contentFontSize: value },
-    });
   };
 
   const scaledPreviewHeight =
@@ -241,79 +202,6 @@ export default function Home() {
                     </option>
                   ))}
                 </select>
-              </div>
-
-              {/* Font Family */}
-              <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-zinc-550 uppercase tracking-wide flex items-center gap-1.5">
-                  <Type className="h-3.5 w-3.5 text-zinc-400" />
-                  Personal Details Font
-                </label>
-                <select
-                  value={theme.font}
-                  onChange={(e) => handleThemeChange("font", e.target.value)}
-                  className="w-full px-3 py-2 text-xs rounded-lg border border-zinc-200 dark:border-zinc-800 bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium"
-                >
-                  {FONT_OPTIONS.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className="space-y-2 rounded-lg border border-zinc-100 dark:border-zinc-900 p-3">
-              <div className="flex items-center justify-between gap-3">
-                <label className="text-[11px] font-bold text-zinc-550 uppercase tracking-wide flex items-center gap-1.5">
-                  <TextCursorInput className="h-3.5 w-3.5 text-zinc-400" />
-                  Section Font Size
-                </label>
-                <span className="text-[11px] font-semibold text-zinc-500">{theme.contentFontSize}px</span>
-              </div>
-              <input
-                type="range"
-                min={10}
-                max={15}
-                step={0.5}
-                value={theme.contentFontSize}
-                onChange={(e) => handleContentFontSizeChange(Number(e.target.value))}
-                className="w-full accent-blue-600"
-              />
-              <p className="text-[11px] text-zinc-500">
-                Applies to all resume sections below the personal details header.
-              </p>
-            </div>
-
-            <div className="space-y-2 rounded-lg border border-zinc-100 dark:border-zinc-900 p-3">
-              <div>
-                <label className="text-[11px] font-bold text-zinc-550 uppercase tracking-wide flex items-center gap-1.5">
-                  <Type className="h-3.5 w-3.5 text-zinc-400" />
-                  Section Fonts
-                </label>
-                <p className="mt-1 text-[11px] text-zinc-500">
-                  Each section can use its own font. Personal details stay controlled separately above.
-                </p>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                {SECTION_FONT_KEYS.map((sectionId) => (
-                  <div key={sectionId} className="space-y-1">
-                    <label className="text-[10px] font-semibold uppercase tracking-wide text-zinc-500">
-                      {SECTION_LABELS[sectionId]}
-                    </label>
-                    <select
-                      value={theme.sectionFonts[sectionId]}
-                      onChange={(e) => handleSectionFontChange(sectionId, e.target.value)}
-                      className="w-full px-2.5 py-2 text-xs rounded-lg border border-zinc-200 dark:border-zinc-800 bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium"
-                    >
-                      {FONT_OPTIONS.map((opt) => (
-                        <option key={`${sectionId}-${opt.value}`} value={opt.value}>
-                          {opt.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                ))}
               </div>
             </div>
 

@@ -1,7 +1,17 @@
 "use client";
 
 import React, { useState } from "react";
-import { useResume, WorkExperience, Education, Project, SkillCategory, Language, Certification } from "../../context/resume-state";
+import {
+  useResume,
+  WorkExperience,
+  Education,
+  Project,
+  SkillCategory,
+  Language,
+  Certification,
+  SECTION_FONT_KEYS,
+  SectionFontKey,
+} from "../../context/resume-state";
 import RichTextEditor from "./RichTextEditor";
 import {
   User,
@@ -18,8 +28,28 @@ import {
   FileText,
   Eye,
   EyeOff,
-  Settings
+  Settings,
+  TextCursorInput,
 } from "lucide-react";
+
+const FONT_OPTIONS = [
+  { name: "Inter (Sans)", value: "inter" },
+  { name: "Outfit (Modern)", value: "outfit" },
+  { name: "Merriweather (Serif)", value: "serif" },
+  { name: "Playfair Display (Elegant)", value: "playfair" },
+  { name: "Roboto Mono (Monospace)", value: "mono" },
+];
+
+const SECTION_LABELS: Record<SectionFontKey, string> = {
+  personalDetails: "Personal Details",
+  summary: "Summary",
+  workExperience: "Experience",
+  education: "Education",
+  projects: "Projects",
+  skills: "Skills",
+  languages: "Languages",
+  certifications: "Certifications",
+};
 
 export default function EditorPanel() {
   const { state, dispatch } = useResume();
@@ -34,7 +64,7 @@ export default function EditorPanel() {
     { id: "skills", label: "Skills", icon: Cpu },
     { id: "languages", label: "Languages", icon: Languages },
     { id: "certifications", label: "Certifications", icon: Award },
-    { id: "visibility", label: "Sections Order", icon: Settings },
+    { id: "visibility", label: "Sections Order & Fonts", icon: Settings },
   ];
 
   return (
@@ -89,7 +119,7 @@ function PersonalInfoForm() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-full flex flex-col gap-6">
       <div>
         <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Personal Details</h3>
         <p className="text-sm text-zinc-500 dark:text-zinc-400">Provide your contact info and personal links.</p>
@@ -242,7 +272,7 @@ function ExperienceForm() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-full flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Work Experience</h3>
@@ -935,7 +965,7 @@ function CertificationsForm() {
 
 function VisibilityForm() {
   const { state, dispatch } = useResume();
-  const { visibleSections } = state;
+  const { visibleSections, theme } = state;
 
   const sectionLabels: Record<string, string> = {
     summary: "Professional Summary",
@@ -949,6 +979,25 @@ function VisibilityForm() {
 
   const handleToggle = (key: string) => {
     dispatch({ type: "TOGGLE_SECTION_VISIBILITY", payload: key });
+  };
+
+  const handleContentFontSizeChange = (value: number) => {
+    dispatch({
+      type: "UPDATE_THEME",
+      payload: { contentFontSize: value },
+    });
+  };
+
+  const handleSectionFontChange = (sectionId: SectionFontKey, value: string) => {
+    dispatch({
+      type: "UPDATE_THEME",
+      payload: {
+        sectionFonts: {
+          ...theme.sectionFonts,
+          [sectionId]: value as typeof theme.font,
+        },
+      },
+    });
   };
 
   return (
@@ -991,7 +1040,67 @@ function VisibilityForm() {
         })}
       </div>
 
-      <div className="p-4 bg-blue-50/50 dark:bg-blue-950/10 border border-blue-100 dark:border-blue-950/30 rounded-lg">
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Font Customization</h3>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">Choose font size for the entire resume and the styles can be choosen independently for each section.</p>
+        </div>
+      </div>
+
+      <div className="space-y-2 rounded-lg border border-zinc-200 dark:border-zinc-800 p-4">
+        <div className="flex items-center justify-between gap-3">
+          <label className="text-[11px] font-bold text-zinc-550 uppercase tracking-wide flex items-center gap-1.5">
+            <TextCursorInput className="h-3.5 w-3.5 text-zinc-400" />
+            Font Size
+          </label>
+          <span className="text-[11px] font-semibold text-zinc-500">{theme.contentFontSize}px</span>
+        </div>
+        <input
+          type="range"
+          min={7}
+          max={15}
+          step={0.1}
+          value={theme.contentFontSize}
+          onChange={(e) => handleContentFontSizeChange(Number(e.target.value))}
+          className="w-full accent-blue-600"
+        />
+        <p className="text-[11px] text-zinc-500">
+          Applies to all resume sections below the personal details header.
+        </p>
+      </div>
+
+      <div className="space-y-2 rounded-lg border border-zinc-200 dark:border-zinc-800 p-4">
+        <div>
+          <label className="text-[11px] font-bold text-zinc-550 uppercase tracking-wide">
+            Section Fonts
+          </label>
+          <p className="mt-1 text-[11px] text-zinc-500">
+            Each section can use its own font, including the personal details header.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {SECTION_FONT_KEYS.map((sectionId) => (
+            <div key={sectionId} className="space-y-1">
+              <label className="text-[10px] font-semibold uppercase tracking-wide text-zinc-500">
+                {SECTION_LABELS[sectionId]}
+              </label>
+              <select
+                value={theme.sectionFonts[sectionId]}
+                onChange={(e) => handleSectionFontChange(sectionId, e.target.value)}
+                className="w-full px-2.5 py-2 text-xs rounded-lg border border-zinc-200 dark:border-zinc-800 bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium"
+              >
+                {FONT_OPTIONS.map((opt) => (
+                  <option key={`${sectionId}-${opt.value}`} value={opt.value}>
+                    {opt.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-auto p-4 bg-blue-50/50 dark:bg-blue-950/10 border border-blue-100 dark:border-blue-950/30 rounded-lg">
         <p className="text-xs text-blue-700 dark:text-blue-400 leading-normal">
           <strong>Pro-Tip:</strong> To rearrange the physical layout of your resume sections, simply hover over a section on the <strong>Right-Side Live Preview</strong> and drag it to your desired order.
         </p>

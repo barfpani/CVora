@@ -77,11 +77,12 @@ function getSectionTextStyle(state: ResumeState): React.CSSProperties {
 export function TemplateHeader({ state, primaryColor }: SectionProps) {
   const { personalInfo, theme } = state;
   const { template } = theme;
+  const personalFontClass = getSectionFontClass(state, "personalDetails");
 
   // Modern Template Header
   if (template === "modern") {
     return (
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-zinc-200 dark:border-zinc-800">
+      <div className={`${personalFontClass} flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-zinc-200 dark:border-zinc-800`}>
         <div className="flex items-center gap-4">
           {personalInfo.photo && (
             <img
@@ -145,7 +146,7 @@ export function TemplateHeader({ state, primaryColor }: SectionProps) {
   // Minimalist Template Header
   if (template === "minimalist") {
     return (
-      <div className="text-center pb-5 border-b border-zinc-100 dark:border-zinc-900">
+      <div className={`${personalFontClass} text-center pb-5 border-b border-zinc-100 dark:border-zinc-900`}>
         <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
           {personalInfo.name || "Your Name"}
         </h1>
@@ -168,7 +169,7 @@ export function TemplateHeader({ state, primaryColor }: SectionProps) {
   // Creative Template Header
   if (template === "creative") {
     return (
-      <div className="relative p-6 -mx-8 -mt-8 mb-6 rounded-t-xl" style={{ backgroundColor: `${primaryColor}12` }}>
+      <div className={`${personalFontClass} relative p-6 -mx-8 -mt-8 mb-6 rounded-t-xl`} style={{ backgroundColor: `${primaryColor}12` }}>
         <div className="absolute top-0 left-0 w-2 h-full" style={{ backgroundColor: primaryColor }} />
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
@@ -197,7 +198,7 @@ export function TemplateHeader({ state, primaryColor }: SectionProps) {
 
   // Professional Template Header (default)
   return (
-    <div className="pb-5 border-b-2 border-zinc-800 dark:border-zinc-200">
+    <div className={`${personalFontClass} pb-5 border-b-2 border-zinc-800 dark:border-zinc-200`}>
       <div className="flex flex-col md:flex-row md:items-end justify-between">
         <div>
           <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">

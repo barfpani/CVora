@@ -66,6 +66,7 @@ export interface Certification {
 }
 
 export const SECTION_FONT_KEYS = [
+  "personalDetails",
   "summary",
   "workExperience",
   "education",
@@ -108,6 +109,8 @@ const DEFAULT_SECTIONS_ORDER = [
   "languages",
   "certifications",
 ];
+
+// Dummy data for initial state
 
 const INITIAL_STATE: ResumeState = {
   personalInfo: {
@@ -253,6 +256,7 @@ const INITIAL_STATE: ResumeState = {
     documentName: "Resume Craft Resume",
     contentFontSize: 12,
     sectionFonts: {
+      personalDetails: "inter",
       summary: "inter",
       workExperience: "inter",
       education: "inter",
@@ -556,6 +560,7 @@ function resumeReducer(state: ResumeState, action: ResumeAction): ResumeState {
           documentName: "Resume Craft Resume",
           contentFontSize: 12,
           sectionFonts: {
+            personalDetails: "inter",
             summary: "inter",
             workExperience: "inter",
             education: "inter",
