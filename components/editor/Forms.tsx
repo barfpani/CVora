@@ -52,10 +52,11 @@ const SECTION_LABELS: Record<SectionFontKey, string> = {
 };
 
 export default function EditorPanel() {
-  const { state, dispatch } = useResume();
+  const { state } = useResume();
   const [activeTab, setActiveTab] = useState<string>("personal");
 
   const tabs = [
+    { id: "customizeTemplate", label: "Customize Template", icon: TextCursorInput },
     { id: "personal", label: "Personal Details", icon: User },
     { id: "summary", label: "Professional Summary", icon: FileText },
     { id: "experience", label: "Work Experience", icon: Briefcase },
@@ -64,7 +65,7 @@ export default function EditorPanel() {
     { id: "skills", label: "Skills", icon: Cpu },
     { id: "languages", label: "Languages", icon: Languages },
     { id: "certifications", label: "Certifications", icon: Award },
-    { id: "visibility", label: "Sections Order & Fonts", icon: Settings },
+    { id: "visibility", label: "Sections Order", icon: Settings },
   ];
 
   return (
@@ -93,6 +94,7 @@ export default function EditorPanel() {
 
       {/* Tab Content Panel */}
       <div className="flex-1 p-6 overflow-y-auto max-h-[calc(100vh-280px)] lg:max-h-[calc(100vh-140px)]">
+        {activeTab === "customizeTemplate" && <CustomizeTemplateForm />}
         {activeTab === "personal" && <PersonalInfoForm />}
         {activeTab === "summary" && <SummaryForm />}
         {activeTab === "experience" && <ExperienceForm />}
@@ -107,9 +109,210 @@ export default function EditorPanel() {
   );
 }
 
+function CustomizeTemplateForm() {
+  const { state, dispatch } = useResume();
+  const { theme } = state;
+
+  const TEMPLATE_OPTIONS = [
+    { name: "Modern Sidebar", value: "modern" },
+    { name: "Clean Minimalist", value: "minimalist" },
+    { name: "Corporate Professional", value: "professional" },
+    { name: "Creative Bold", value: "creative" },
+  ];
+
+  const COLOR_PRESETS = [
+    { name: "Indigo", value: "#6366f1" },
+    { name: "Blue", value: "#3b82f6" },
+    { name: "Emerald", value: "#10b981" },
+    { name: "Rose", value: "#f43f5e" },
+    { name: "Violet", value: "#8b5cf6" },
+    { name: "Amber", value: "#f59e0b" },
+    { name: "Slate", value: "#4b5563" },
+  ];
+
+  const handleThemeChange = (
+    field: "template" | "primaryColor" | "documentName",
+    value: string
+  ) => {
+    dispatch({ type: "UPDATE_THEME", payload: { [field]: value } });
+  };
+
+  const handleContentFontSizeChange = (value: number) => {
+    dispatch({
+      type: "UPDATE_THEME",
+      payload: { contentFontSize: value },
+    });
+  };
+
+  const handleSectionFontChange = (sectionId: SectionFontKey, value: string) => {
+    dispatch({
+      type: "UPDATE_THEME",
+      payload: {
+        sectionFonts: {
+          ...theme.sectionFonts,
+          [sectionId]: value as typeof theme.font,
+        },
+      },
+    });
+  };
+
+  return (
+    <div className="min-h-full flex flex-col gap-6">
+      <div>
+        <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Customize Template</h3>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+          Manage your resume file name, template style, accent color, and all font customization in one place.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2 md:col-span-2">
+          <label className="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+            Resume File Name
+          </label>
+          <input
+            type="text"
+            value={theme.documentName}
+            onChange={(e) => handleThemeChange("documentName", e.target.value)}
+            placeholder="My Resume"
+            className="w-full px-3.5 py-2 text-sm rounded-lg border border-zinc-200 dark:border-zinc-800 bg-transparent text-zinc-950 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+            Template
+          </label>
+          <select
+            value={theme.template}
+            onChange={(e) => handleThemeChange("template", e.target.value)}
+            className="w-full px-3.5 py-2 text-sm rounded-lg border border-zinc-200 dark:border-zinc-800 bg-transparent text-zinc-950 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+          >
+            {TEMPLATE_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div className="space-y-3 rounded-lg border border-zinc-200 dark:border-zinc-800 p-4">
+        <div>
+          <h4 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Accent Color</h4>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            Pick one of the presets or set a custom color.
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          {COLOR_PRESETS.map((preset) => {
+            const isSelected = theme.primaryColor.toLowerCase() === preset.value.toLowerCase();
+            return (
+              <button
+                key={preset.value}
+                type="button"
+                onClick={() => handleThemeChange("primaryColor", preset.value)}
+                className={`h-7 w-7 rounded-full border transition-all duration-150 relative cursor-pointer ${
+                  isSelected
+                    ? "border-zinc-900 scale-110 dark:border-zinc-100 shadow-md ring-2 ring-blue-500/20"
+                    : "border-transparent hover:scale-105"
+                }`}
+                style={{ backgroundColor: preset.value }}
+                title={preset.name}
+              >
+                {isSelected && (
+                  <span className="absolute inset-0 m-auto h-1.5 w-1.5 rounded-full bg-white shadow-sm" />
+                )}
+              </button>
+            );
+          })}
+
+          <div className="h-6 w-px bg-zinc-200 dark:bg-zinc-800 mx-1" />
+
+          <div className="flex items-center gap-2">
+            <input
+              type="color"
+              id="custom-accent-color"
+              value={theme.primaryColor}
+              onChange={(e) => handleThemeChange("primaryColor", e.target.value)}
+              className="h-7 w-7 rounded-full border border-zinc-200 dark:border-zinc-800 bg-transparent p-0 cursor-pointer overflow-hidden outline-none"
+              title="Choose Custom Color"
+            />
+            <label htmlFor="custom-accent-color" className="text-xs text-zinc-500 font-medium cursor-pointer">
+              Custom color
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Font Customization</h3>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            Choose font size for the entire resume and select fonts independently for each section.
+          </p>
+        </div>
+      </div>
+
+      <div className="space-y-2 rounded-lg border border-zinc-200 dark:border-zinc-800 p-4">
+        <div className="flex items-center justify-between gap-3">
+          <label className="text-[11px] font-bold text-zinc-550 uppercase tracking-wide flex items-center gap-1.5">
+            <TextCursorInput className="h-3.5 w-3.5 text-zinc-400" />
+            Font Size
+          </label>
+          <span className="text-[11px] font-semibold text-zinc-500">{theme.contentFontSize}px</span>
+        </div>
+        <input
+          type="range"
+          min={7}
+          max={15}
+          step={0.1}
+          value={theme.contentFontSize}
+          onChange={(e) => handleContentFontSizeChange(Number(e.target.value))}
+          className="w-full accent-blue-600"
+        />
+        <p className="text-[11px] text-zinc-500">
+          Applies to all resume sections below the personal details header.
+        </p>
+      </div>
+
+      <div className="space-y-2 rounded-lg border border-zinc-200 dark:border-zinc-800 p-4">
+        <div>
+          <label className="text-[11px] font-bold text-zinc-550 uppercase tracking-wide">
+            Section Fonts
+          </label>
+          <p className="mt-1 text-[11px] text-zinc-500">
+            Each section can use its own font, including the personal details header.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {SECTION_FONT_KEYS.map((sectionId) => (
+            <div key={sectionId} className="space-y-1">
+              <label className="text-[10px] font-semibold uppercase tracking-wide text-zinc-500">
+                {SECTION_LABELS[sectionId]}
+              </label>
+              <select
+                value={theme.sectionFonts[sectionId]}
+                onChange={(e) => handleSectionFontChange(sectionId, e.target.value)}
+                className="w-full px-2.5 py-2 text-xs rounded-lg border border-zinc-200 dark:border-zinc-800 bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium"
+              >
+                {FONT_OPTIONS.map((option) => (
+                  <option key={`${sectionId}-${option.value}`} value={option.value}>
+                    {option.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function PersonalInfoForm() {
   const { state, dispatch } = useResume();
-  const { personalInfo } = state;
+  const { personalInfo } = state;                                   
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     dispatch({
@@ -965,7 +1168,7 @@ function CertificationsForm() {
 
 function VisibilityForm() {
   const { state, dispatch } = useResume();
-  const { visibleSections, theme } = state;
+  const { visibleSections } = state;
 
   const sectionLabels: Record<string, string> = {
     summary: "Professional Summary",
@@ -981,27 +1184,8 @@ function VisibilityForm() {
     dispatch({ type: "TOGGLE_SECTION_VISIBILITY", payload: key });
   };
 
-  const handleContentFontSizeChange = (value: number) => {
-    dispatch({
-      type: "UPDATE_THEME",
-      payload: { contentFontSize: value },
-    });
-  };
-
-  const handleSectionFontChange = (sectionId: SectionFontKey, value: string) => {
-    dispatch({
-      type: "UPDATE_THEME",
-      payload: {
-        sectionFonts: {
-          ...theme.sectionFonts,
-          [sectionId]: value as typeof theme.font,
-        },
-      },
-    });
-  };
-
   return (
-    <div className="space-y-6">
+    <div className="min-h-full flex flex-col gap-6">
       <div>
         <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Section Visibility</h3>
         <p className="text-sm text-zinc-500 dark:text-zinc-400">Toggle sections off or on. Hidden sections will not render in the live preview or PDF.</p>
@@ -1038,66 +1222,6 @@ function VisibilityForm() {
             </div>
           );
         })}
-      </div>
-
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Font Customization</h3>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">Choose font size for the entire resume and the styles can be choosen independently for each section.</p>
-        </div>
-      </div>
-
-      <div className="space-y-2 rounded-lg border border-zinc-200 dark:border-zinc-800 p-4">
-        <div className="flex items-center justify-between gap-3">
-          <label className="text-[11px] font-bold text-zinc-550 uppercase tracking-wide flex items-center gap-1.5">
-            <TextCursorInput className="h-3.5 w-3.5 text-zinc-400" />
-            Font Size
-          </label>
-          <span className="text-[11px] font-semibold text-zinc-500">{theme.contentFontSize}px</span>
-        </div>
-        <input
-          type="range"
-          min={7}
-          max={15}
-          step={0.1}
-          value={theme.contentFontSize}
-          onChange={(e) => handleContentFontSizeChange(Number(e.target.value))}
-          className="w-full accent-blue-600"
-        />
-        <p className="text-[11px] text-zinc-500">
-          Applies to all resume sections below the personal details header.
-        </p>
-      </div>
-
-      <div className="space-y-2 rounded-lg border border-zinc-200 dark:border-zinc-800 p-4">
-        <div>
-          <label className="text-[11px] font-bold text-zinc-550 uppercase tracking-wide">
-            Section Fonts
-          </label>
-          <p className="mt-1 text-[11px] text-zinc-500">
-            Each section can use its own font, including the personal details header.
-          </p>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {SECTION_FONT_KEYS.map((sectionId) => (
-            <div key={sectionId} className="space-y-1">
-              <label className="text-[10px] font-semibold uppercase tracking-wide text-zinc-500">
-                {SECTION_LABELS[sectionId]}
-              </label>
-              <select
-                value={theme.sectionFonts[sectionId]}
-                onChange={(e) => handleSectionFontChange(sectionId, e.target.value)}
-                className="w-full px-2.5 py-2 text-xs rounded-lg border border-zinc-200 dark:border-zinc-800 bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium"
-              >
-                {FONT_OPTIONS.map((opt) => (
-                  <option key={`${sectionId}-${opt.value}`} value={opt.value}>
-                    {opt.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          ))}
-        </div>
       </div>
 
       <div className="mt-auto p-4 bg-blue-50/50 dark:bg-blue-950/10 border border-blue-100 dark:border-blue-950/30 rounded-lg">

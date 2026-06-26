@@ -11,36 +11,15 @@ import ResumeSheet, {
 } from "../components/preview/ResumeSheet";
 import { exportToPDF } from "../utils/pdf";
 import {
-  Sparkles,
   Download,
   Trash2,
   RefreshCw,
   Sun,
   Moon,
-  Palette,
-  LayoutTemplate,
   ZoomIn,
   ZoomOut,
   FileCheck,
-  FileText,
 } from "lucide-react";
-
-const COLOR_PRESETS = [
-  { name: "Indigo", value: "#6366f1" },
-  { name: "Blue", value: "#3b82f6" },
-  { name: "Emerald", value: "#10b981" },
-  { name: "Rose", value: "#f43f5e" },
-  { name: "Violet", value: "#8b5cf6" },
-  { name: "Amber", value: "#f59e0b" },
-  { name: "Slate", value: "#4b5563" },
-];
-
-const TEMPLATE_OPTIONS = [
-  { name: "Modern Sidebar", value: "modern" },
-  { name: "Clean Minimalist", value: "minimalist" },
-  { name: "Corporate Professional", value: "professional" },
-  { name: "Creative Bold", value: "creative" },
-];
 
 export default function Home() {
   const { state, dispatch } = useResume();
@@ -87,13 +66,6 @@ export default function Home() {
     if (confirm("Are you sure you want to clear all data? This will empty all inputs.")) {
       dispatch({ type: "CLEAR_ALL" });
     }
-  };
-
-  const handleThemeChange = (
-    field: "template" | "primaryColor" | "documentName",
-    value: string
-  ) => {
-    dispatch({ type: "UPDATE_THEME", payload: { [field]: value } });
   };
 
   const scaledPreviewHeight =
@@ -163,94 +135,8 @@ export default function Home() {
 
         {/* Right Side: Customize & Live Preview */}
         <section className="lg:col-span-6 xl:col-span-5 flex flex-col gap-4">
-          {/* Controls Bar */}
+          {/* Preview Controls */}
           <div className="bg-white dark:bg-zinc-950 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-4">
-            <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-blue-500" />
-              Customize Template
-            </h3>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5 col-span-2">
-                <label className="text-[11px] font-bold text-zinc-550 uppercase tracking-wide flex items-center gap-1.5">
-                  <FileText className="h-3.5 w-3.5 text-zinc-400" />
-                  Resume File Name
-                </label>
-                <input
-                  type="text"
-                  value={theme.documentName}
-                  onChange={(e) => handleThemeChange("documentName", e.target.value)}
-                  placeholder="My Resume"
-                  className="w-full px-3 py-2 text-xs rounded-lg border border-zinc-200 dark:border-zinc-800 bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium"
-                />
-              </div>
-
-              {/* Template Style */}
-              <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-zinc-550 uppercase tracking-wide flex items-center gap-1.5">
-                  <LayoutTemplate className="h-3.5 w-3.5 text-zinc-400" />
-                  Template
-                </label>
-                <select
-                  value={theme.template}
-                  onChange={(e) => handleThemeChange("template", e.target.value)}
-                  className="w-full px-3 py-2 text-xs rounded-lg border border-zinc-200 dark:border-zinc-800 bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium"
-                >
-                  {TEMPLATE_OPTIONS.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {/* Accent Color Selection */}
-            <div className="space-y-2">
-              <label className="text-[11px] font-bold text-zinc-550 uppercase tracking-wide flex items-center gap-1.5">
-                <Palette className="h-3.5 w-3.5 text-zinc-400" />
-                Accent Color
-              </label>
-              <div className="flex flex-wrap items-center gap-2">
-                {COLOR_PRESETS.map((preset) => {
-                  const isSelected = theme.primaryColor.toLowerCase() === preset.value.toLowerCase();
-                  return (
-                    <button
-                      key={preset.value}
-                      onClick={() => handleThemeChange("primaryColor", preset.value)}
-                      className={`h-6 w-6 rounded-full border transition-all duration-150 relative cursor-pointer ${isSelected
-                        ? "border-zinc-900 scale-110 dark:border-zinc-100 shadow-md ring-2 ring-blue-500/20"
-                        : "border-transparent hover:scale-105"
-                        }`}
-                      style={{ backgroundColor: preset.value }}
-                      title={preset.name}
-                    >
-                      {isSelected && (
-                        <span className="absolute inset-0 m-auto h-1.5 w-1.5 rounded-full bg-white shadow-sm" />
-                      )}
-                    </button>
-                  );
-                })}
-
-                <div className="h-6 w-px bg-zinc-200 dark:bg-zinc-800 mx-1" />
-
-                {/* Custom Color Input */}
-                <div className="flex items-center gap-1.5">
-                  <input
-                    type="color"
-                    id="custom-accent-color"
-                    value={theme.primaryColor}
-                    onChange={(e) => handleThemeChange("primaryColor", e.target.value)}
-                    className="h-6 w-6 rounded-full border border-zinc-200 dark:border-zinc-800 bg-transparent p-0 cursor-pointer overflow-hidden outline-none"
-                    title="Choose Custom Color"
-                  />
-                  <label htmlFor="custom-accent-color" className="text-[10px] text-zinc-500 font-semibold cursor-pointer">
-                    Custom Hex
-                  </label>
-                </div>
-              </div>
-            </div>
-
             {/* Scale/Zoom Selector */}
             <div className="flex items-center justify-between border-t border-zinc-100 dark:border-zinc-900 pt-3">
               <span className="text-xs font-semibold text-zinc-500">Preview Scale: {Math.round(zoomScale * 100)}%</span>
