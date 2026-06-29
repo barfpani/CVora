@@ -2,34 +2,35 @@
 
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useResume, ResumeState } from "../../context/resume-state";
-import { getFontClass, TemplateHeader } from "./Templates";
 import {
-  RenderSummary,
-  RenderExperience,
+  getFontClass,
+  RenderCertifications,
   RenderEducation,
+  RenderExperience,
+  RenderLanguages,
   RenderProjects,
   RenderSkills,
-  RenderLanguages,
-  RenderCertifications,
+  RenderSummary,
+  TemplateHeader,
 } from "./Templates";
 import {
   DndContext,
   closestCenter,
+  DragEndEvent,
   KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
-  DragEndEvent,
 } from "@dnd-kit/core";
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import {
   arrayMove,
-  SortableContext,
   sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
+  SortableContext,
   useSortable,
+  verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { GripVertical } from "lucide-react";
 
 export const RESUME_PAGE_WIDTH = 794;
@@ -37,19 +38,31 @@ export const RESUME_PAGE_HEIGHT = 1123;
 export const RESUME_PAGE_GAP = 28;
 const PAGE_PADDING_X = 52;
 const PAGE_PADDING_Y = 48;
-const HEADER_TO_SECTION_GAP = 20;
 
 interface ResumeSheetProps {
   onPageCountChange?: (pageCount: number) => void;
+}
+
+interface SortableSectionProps {
+  id: string;
+  state: ResumeState;
+  primaryColor: string;
+}
+
+interface PageFrameProps {
+  children: React.ReactNode;
+  className: string;
+  contentRef?: (node: HTMLDivElement | null) => void;
+  primaryColor: string;
+  showHeader: boolean;
+  state: ResumeState;
 }
 
 export default function ResumeSheet({ onPageCountChange }: ResumeSheetProps) {
   const { state, dispatch } = useResume();
   const { theme, sectionsOrder, visibleSections } = state;
   const [pages, setPages] = useState<string[][]>([[]]);
-  const [headerHeight, setHeaderHeight] = useState(0);
-  const measurementHeaderRef = useRef<HTMLDivElement | null>(null);
-  const measurementSectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const pageContentRefs = useRef<Record<number, HTMLDivElement | null>>({});
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -70,15 +83,58 @@ export default function ResumeSheet({ onPageCountChange }: ResumeSheetProps) {
     [sectionsOrder, state, visibleSections]
   );
 
+  const paginationKey = useMemo(
+    () =>
+      JSON.stringify({
+        visibleSectionIds,
+        personalInfo: state.personalInfo,
+        summary: state.summary,
+        workExperience: state.workExperience,
+        education: state.education,
+        projects: state.projects,
+        skills: state.skills,
+        languages: state.languages,
+        certifications: state.certifications,
+        theme: {
+          template: state.theme.template,
+          primaryColor: state.theme.primaryColor,
+          font: state.theme.font,
+          contentFontSize: state.theme.contentFontSize,
+          sectionFonts: state.theme.sectionFonts,
+        },
+      }),
+    [
+      state.certifications,
+      state.education,
+      state.languages,
+      state.personalInfo,
+      state.projects,
+      state.skills,
+      state.summary,
+      state.theme.contentFontSize,
+      state.theme.font,
+      state.theme.primaryColor,
+      state.theme.sectionFonts,
+      state.theme.template,
+      state.workExperience,
+      visibleSectionIds,
+    ]
+  );
+
+  useLayoutEffect(() => {
+    setPages(visibleSectionIds.length > 0 ? [visibleSectionIds] : [[]]);
+  }, [paginationKey, visibleSectionIds]);
+
   useLayoutEffect(() => {
     const frame = requestAnimationFrame(() => {
-      const nextHeaderHeight = measurementHeaderRef.current?.getBoundingClientRect().height ?? 0;
-      const nextPages = buildPages(visibleSectionIds, measurementSectionRefs.current, nextHeaderHeight);
-      setHeaderHeight(nextHeaderHeight);
-      setPages(nextPages);
+      setPages((currentPages) => {
+        const nextPages = rebalancePages(currentPages, pageContentRefs.current);
+        return pagesEqual(currentPages, nextPages) ? currentPages : nextPages;
+      });
     });
+
     return () => cancelAnimationFrame(frame);
-  }, [state, visibleSectionIds]);
+  }, [pages, paginationKey]);
 
   useEffect(() => {
     onPageCountChange?.(pages.length || 1);
@@ -98,100 +154,69 @@ export default function ResumeSheet({ onPageCountChange }: ResumeSheetProps) {
   };
 
   const fontClass = getFontClass(theme.sectionFonts.personalDetails ?? theme.font);
-  const headerSpacer = headerHeight > 0 ? headerHeight + HEADER_TO_SECTION_GAP : undefined;
 
   return (
-    <>
-      <div
-        aria-hidden="true"
-        className="pointer-events-none fixed -left-[9999px] top-0 opacity-0"
+    <div id="resume-preview-stack" className="flex flex-col gap-7">
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        modifiers={[restrictToVerticalAxis]}
+        onDragEnd={handleDragEnd}
       >
-        <div
-          className={`bg-white text-zinc-900 ${fontClass}`}
-          style={{
-            width: `${RESUME_PAGE_WIDTH}px`,
-            padding: `${PAGE_PADDING_Y}px ${PAGE_PADDING_X}px`,
-            boxSizing: "border-box",
-          }}
-        >
-          <div ref={measurementHeaderRef}>
-            <TemplateHeader state={state} primaryColor={theme.primaryColor} />
-          </div>
-          <div className="mt-5 space-y-4">
-            {visibleSectionIds.map((sectionId) => (
-              <div
-                key={`measure-${sectionId}`}
-                ref={(node) => {
-                  measurementSectionRefs.current[sectionId] = node;
-                }}
-              >
-                <SectionBody id={sectionId} state={state} primaryColor={theme.primaryColor} />
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div id="resume-preview-stack" className="flex flex-col gap-7">
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          modifiers={[restrictToVerticalAxis]}
-          onDragEnd={handleDragEnd}
-        >
-          <SortableContext items={visibleSectionIds} strategy={verticalListSortingStrategy}>
-            {pages.map((pageSectionIds, pageIndex) => (
-              <div
-                key={`page-${pageIndex}`}
-                data-resume-page="true"
-                className={`bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 shadow-xl border border-zinc-200 dark:border-zinc-800 rounded-sm relative selection:bg-blue-100 dark:selection:bg-blue-950/40 select-text ${fontClass} leading-normal overflow-hidden`}
-                style={{
-                  width: `${RESUME_PAGE_WIDTH}px`,
-                  minHeight: `${RESUME_PAGE_HEIGHT}px`,
-                  padding: `${PAGE_PADDING_Y}px ${PAGE_PADDING_X}px`,
-                  boxSizing: "border-box",
-                  flexShrink: 0,
-                }}
-              >
-                {pageIndex === 0 ? (
-                  <>
-                    <TemplateHeader state={state} primaryColor={theme.primaryColor} />
-                    <div className="mt-5 space-y-4">
-                      {pageSectionIds.map((sectionId) => (
-                        <SortableSection
-                          key={sectionId}
-                          id={sectionId}
-                          state={state}
-                          primaryColor={theme.primaryColor}
-                        />
-                      ))}
-                    </div>
-                  </>
-                ) : (
-                  <div className="space-y-4" style={headerSpacer ? { paddingTop: `${headerSpacer}px` } : undefined}>
-                    {pageSectionIds.map((sectionId) => (
-                      <SortableSection
-                        key={sectionId}
-                        id={sectionId}
-                        state={state}
-                        primaryColor={theme.primaryColor}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </SortableContext>
-        </DndContext>
-      </div>
-    </>
+        <SortableContext items={visibleSectionIds} strategy={verticalListSortingStrategy}>
+          {pages.map((pageSectionIds, pageIndex) => (
+            <PageFrame
+              key={`page-${pageIndex}`}
+              className={fontClass}
+              contentRef={(node) => {
+                pageContentRefs.current[pageIndex] = node;
+              }}
+              showHeader={pageIndex === 0}
+              state={state}
+              primaryColor={theme.primaryColor}
+            >
+              {pageSectionIds.map((sectionId) => (
+                <SortableSection
+                  key={sectionId}
+                  id={sectionId}
+                  state={state}
+                  primaryColor={theme.primaryColor}
+                />
+              ))}
+            </PageFrame>
+          ))}
+        </SortableContext>
+      </DndContext>
+    </div>
   );
 }
 
-interface SortableSectionProps {
-  id: string;
-  state: ResumeState;
-  primaryColor: string;
+function PageFrame({ children, className, contentRef, primaryColor, showHeader, state }: PageFrameProps) {
+  return (
+    <div
+      data-resume-page="true"
+      className={`relative flex shrink-0 flex-col overflow-hidden rounded-sm border border-zinc-200 bg-white text-zinc-900 shadow-xl selection:bg-blue-100 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50 dark:selection:bg-blue-950/40 ${className}`}
+      style={{
+        width: `${RESUME_PAGE_WIDTH}px`,
+        height: `${RESUME_PAGE_HEIGHT}px`,
+        padding: `${PAGE_PADDING_Y}px ${PAGE_PADDING_X}px`,
+        boxSizing: "border-box",
+      }}
+    >
+      {showHeader ? (
+        <>
+          <TemplateHeader state={state} primaryColor={primaryColor} />
+          <div ref={contentRef} className="mt-5 min-h-0 flex-1 overflow-hidden">
+            <div className="space-y-4">{children}</div>
+          </div>
+        </>
+      ) : (
+        <div ref={contentRef} className="min-h-0 flex-1 overflow-hidden">
+          <div className="space-y-4">{children}</div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 function SortableSection({ id, state, primaryColor }: SortableSectionProps) {
@@ -208,15 +233,15 @@ function SortableSection({ id, state, primaryColor }: SortableSectionProps) {
     <div
       ref={setNodeRef}
       style={style}
-      className="group relative p-2 -mx-2 rounded-lg border border-transparent hover:border-blue-200 dark:hover:border-blue-900/50 hover:bg-blue-50/10 dark:hover:bg-blue-950/5 transition-all duration-150"
+      className="group relative -mx-2 rounded-lg border border-transparent p-2 transition-all duration-150 hover:border-blue-200 hover:bg-blue-50/10 dark:hover:border-blue-900/50 dark:hover:bg-blue-950/5"
     >
       <div
         {...attributes}
         {...listeners}
-        className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 flex items-center gap-1.5 px-1.5 py-1 bg-white dark:bg-zinc-850 hover:bg-zinc-50 border border-zinc-200 dark:border-zinc-700 text-zinc-400 hover:text-blue-600 rounded-md shadow-sm cursor-grab active:cursor-grabbing transition-all duration-150 z-10"
+        className="absolute top-1 right-1 z-10 flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-1.5 py-1 text-zinc-400 opacity-0 shadow-sm transition-all duration-150 hover:bg-zinc-50 hover:text-blue-600 group-hover:opacity-100 active:cursor-grabbing dark:border-zinc-700 dark:bg-zinc-850"
         title="Drag to reorder section"
       >
-        <GripVertical className="h-3.5 w-3.5" />
+        <GripVertical className="h-3.5 w-3.5 cursor-grab" />
         <span className="text-[9px] font-bold uppercase tracking-wider text-zinc-500">Reorder</span>
       </div>
 
@@ -267,39 +292,57 @@ function hasSectionContent(id: string, state: ResumeState) {
   }
 }
 
-function buildPages(
-  visibleSectionIds: string[],
-  sectionRefs: Record<string, HTMLDivElement | null>,
-  measuredHeaderHeight: number
+function rebalancePages(
+  currentPages: string[][],
+  pageContentRefs: Record<number, HTMLDivElement | null>
 ) {
-  if (visibleSectionIds.length === 0) {
-    return [[]];
-  }
+  const nextPages = normalizePages(currentPages.map((page) => [...page]));
 
-  const firstPageLimit =
-    RESUME_PAGE_HEIGHT - PAGE_PADDING_Y * 2 - measuredHeaderHeight - HEADER_TO_SECTION_GAP;
-  const followingPageLimit = RESUME_PAGE_HEIGHT - PAGE_PADDING_Y * 2;
+  for (let pageIndex = 0; pageIndex < nextPages.length; pageIndex += 1) {
+    const pageContent = pageContentRefs[pageIndex];
+    if (!pageContent) continue;
 
-  const nextPages: string[][] = [[]];
-  let currentPageIndex = 0;
-  let usedHeight = 0;
+    const isOverflowing = pageContent.scrollHeight > pageContent.clientHeight + 1;
+    if (!isOverflowing) continue;
 
-  visibleSectionIds.forEach((sectionId) => {
-    const sectionHeight = sectionRefs[sectionId]?.getBoundingClientRect().height ?? 0;
-    const pageLimit = currentPageIndex === 0 ? firstPageLimit : followingPageLimit;
-    const gap = nextPages[currentPageIndex].length > 0 ? 16 : 0;
-    const nextHeight = usedHeight + gap + sectionHeight;
-
-    if (nextPages[currentPageIndex].length > 0 && nextHeight > pageLimit) {
-      nextPages.push([sectionId]);
-      currentPageIndex += 1;
-      usedHeight = sectionHeight;
-      return;
+    if (nextPages[pageIndex].length <= 1) {
+      continue;
     }
 
-    nextPages[currentPageIndex].push(sectionId);
-    usedHeight = nextHeight;
-  });
+    const movedSectionId = nextPages[pageIndex].pop();
+    if (!movedSectionId) continue;
 
-  return nextPages;
+    if (!nextPages[pageIndex + 1]) {
+      nextPages[pageIndex + 1] = [];
+    }
+
+    nextPages[pageIndex + 1].unshift(movedSectionId);
+    return normalizePages(nextPages);
+  }
+
+  return normalizePages(nextPages);
+}
+
+function normalizePages(pages: string[][]) {
+  const normalized = pages.filter((page, index) => page.length > 0 || index === 0);
+  while (normalized.length > 1 && normalized[normalized.length - 1].length === 0) {
+    normalized.pop();
+  }
+  return normalized.length > 0 ? normalized : [[]];
+}
+
+function pagesEqual(left: string[][], right: string[][]) {
+  if (left.length !== right.length) return false;
+
+  for (let pageIndex = 0; pageIndex < left.length; pageIndex += 1) {
+    if (left[pageIndex].length !== right[pageIndex].length) return false;
+
+    for (let sectionIndex = 0; sectionIndex < left[pageIndex].length; sectionIndex += 1) {
+      if (left[pageIndex][sectionIndex] !== right[pageIndex][sectionIndex]) {
+        return false;
+      }
+    }
+  }
+
+  return true;
 }

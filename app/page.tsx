@@ -27,7 +27,7 @@ export default function Home() {
   const { theme: currentTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
-  const [zoomScale, setZoomScale] = useState<number>(0.65); // Default zoom scale to fit standard laptops
+  const [zoomScale, setZoomScale] = useState<number>(0.60); // Default zoom scale to fit standard laptops
   const [pageCount, setPageCount] = useState(1);
 
   // Prevent hydration mismatches
@@ -133,7 +133,7 @@ export default function Home() {
           <EditorPanel />
         </section>
 
-        {/* Right Side: Customize & Live Preview */}
+        {/* Right Side: Live Preview */}
         <section className="lg:col-span-6 xl:col-span-5 flex flex-col gap-4">
           {/* Preview Controls */}
           <div className="bg-white dark:bg-zinc-950 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-4">
@@ -149,7 +149,7 @@ export default function Home() {
                   <ZoomOut className="h-3.5 w-3.5" />
                 </button>
                 <button
-                  onClick={() => setZoomScale(0.65)}
+                  onClick={() => setZoomScale(0.60)}
                   className="px-2 py-0.5 text-[10px] border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-900 rounded font-semibold text-zinc-600 dark:text-zinc-400 cursor-pointer"
                 >
                   Reset Fit
@@ -173,8 +173,9 @@ export default function Home() {
             </div>
 
             {/* Scaled Preview Wrapper */}
-            <div className="overflow-auto max-h-[calc(100vh-280px)] min-h-[500px] flex justify-center items-start py-6 relative">
+            <div className="overflow-auto max-h-[calc(100vh-280px)] min-h-[500px] p-6 relative">
               <div
+                  className="mx-auto"             
                 style={{
                   width: `${RESUME_PAGE_WIDTH * zoomScale}px`,
                   height: `${scaledPreviewHeight}px`,
@@ -185,7 +186,7 @@ export default function Home() {
                   style={{
                     width: `${RESUME_PAGE_WIDTH}px`,
                     transform: `scale(${zoomScale})`,
-                    transformOrigin: "top center",
+                    transformOrigin: "top left",
                     position: "absolute",
                     top: 0,
                     left: 0,
