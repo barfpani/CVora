@@ -16,6 +16,7 @@ export async function exportToPDF(elementId: string, filename: string = "resume.
 
   const dragHandles = element.querySelectorAll<HTMLElement>("[title='Drag to reorder section']");
   const savedDisplays: string[] = [];
+  let exportRoot: HTMLDivElement | null = null;
 
   try {
     const pages = Array.from(
@@ -31,18 +32,41 @@ export async function exportToPDF(elementId: string, filename: string = "resume.
       el.style.display = "none";
     });
 
+    exportRoot = document.createElement("div");
+    exportRoot.setAttribute("data-export-root", "true");
+    exportRoot.style.position = "fixed";
+    exportRoot.style.left = "-10000px";
+    exportRoot.style.top = "0";
+    exportRoot.style.zIndex = "-1";
+    exportRoot.style.pointerEvents = "none";
+    exportRoot.style.background = "#ffffff";
+    exportRoot.style.padding = "0";
+    exportRoot.style.margin = "0";
+
+    const exportPages = pages.map((page) => {
+      const clone = page.cloneNode(true) as HTMLElement;
+      clone.style.transform = "none";
+      clone.style.margin = "0";
+      clone.style.boxShadow = "none";
+      clone.style.borderRadius = "0";
+      clone.style.opacity = "1";
+      clone.style.filter = "none";
+      clone.querySelectorAll<HTMLElement>("[title='Drag to reorder section']").forEach((handle) => {
+        handle.remove();
+      });
+      exportRoot?.appendChild(clone);
+      return clone;
+    });
+
+    document.body.appendChild(exportRoot);
+
     // A4 dimensions in mm
     const A4_W = 210;
     const A4_H = 297;
     const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
     let isFirstPage = true;
 
-    for (const page of pages) {
-      const originalBoxShadow = page.style.boxShadow;
-      const originalBorderRadius = page.style.borderRadius;
-      page.style.boxShadow = "none";
-      page.style.borderRadius = "0";
-
+    for (const page of exportPages) {
       const canvas = await html2canvas(page, {
         scale: 2,
         useCORS: true,
@@ -52,9 +76,6 @@ export async function exportToPDF(elementId: string, filename: string = "resume.
         width: page.offsetWidth,
         height: page.offsetHeight,
       });
-
-      page.style.boxShadow = originalBoxShadow;
-      page.style.borderRadius = originalBorderRadius;
 
       if (!isFirstPage) {
         pdf.addPage("a4", "portrait");
@@ -75,5 +96,6 @@ export async function exportToPDF(elementId: string, filename: string = "resume.
     dragHandles.forEach((el, i) => {
       el.style.display = savedDisplays[i] ?? "";
     });
+    exportRoot?.remove();
   }
 }
