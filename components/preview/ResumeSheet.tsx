@@ -195,7 +195,7 @@ function PageFrame({ children, className, contentRef, primaryColor, showHeader, 
   return (
     <div
       data-resume-page="true"
-      className={`relative flex shrink-0 flex-col overflow-hidden rounded-sm border border-zinc-200 bg-white text-zinc-900 shadow-xl selection:bg-blue-100 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50 dark:selection:bg-blue-950/40 ${className}`}
+      className={`relative flex shrink-0 flex-col overflow-hidden rounded-sm border border-zinc-200 bg-white text-zinc-900 shadow-xl selection:bg-blue-100 ${className}`}
       style={{
         width: `${RESUME_PAGE_WIDTH}px`,
         height: `${RESUME_PAGE_HEIGHT}px`,
@@ -233,12 +233,12 @@ function SortableSection({ id, state, primaryColor }: SortableSectionProps) {
     <div
       ref={setNodeRef}
       style={style}
-      className="group relative -mx-2 rounded-lg border border-transparent p-2 transition-all duration-150 hover:border-blue-200 hover:bg-blue-50/10 dark:hover:border-blue-900/50 dark:hover:bg-blue-950/5"
+      className="group relative -mx-2 rounded-lg border border-transparent p-2 transition-all duration-150 hover:border-blue-200 hover:bg-blue-50/10"
     >
       <div
         {...attributes}
         {...listeners}
-        className="absolute top-1 right-1 z-10 flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-1.5 py-1 text-zinc-400 opacity-0 shadow-sm transition-all duration-150 hover:bg-zinc-50 hover:text-blue-600 group-hover:opacity-100 active:cursor-grabbing dark:border-zinc-700 dark:bg-zinc-850"
+        className="absolute top-1 right-1 z-10 flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-1.5 py-1 text-zinc-400 opacity-0 shadow-sm transition-all duration-150 hover:bg-zinc-50 hover:text-blue-600 group-hover:opacity-100 active:cursor-grabbing"
         title="Drag to reorder section"
       >
         <GripVertical className="h-3.5 w-3.5 cursor-grab" />

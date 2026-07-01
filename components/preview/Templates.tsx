@@ -35,7 +35,7 @@ function RichTextDisplay({ content, className }: { content: string; className?: 
   if (!content) return null;
   return (
     <div
-      className={`prose max-w-none dark:prose-invert text-xs leading-relaxed text-zinc-700 dark:text-zinc-300 ${className}`}
+      className={`prose max-w-none text-xs leading-relaxed text-zinc-700 ${className}`}
       dangerouslySetInnerHTML={{ __html: content }}
     />
   );
@@ -78,7 +78,6 @@ function isVintageMinimalistTemplate(state: ResumeState) {
 function getVintageFontStyle(): React.CSSProperties {
   return {
     fontFamily: '"Latin Modern Roman", "CMU Serif", "Computer Modern Serif", var(--font-merriweather), serif',
-    color: "#111111",
   };
 }
 
@@ -101,17 +100,17 @@ export function TemplateHeader({ state, primaryColor }: SectionProps) {
   // Modern Template Header
   if (template === "modern") {
     return (
-      <div className={`${personalFontClass} flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-zinc-200 dark:border-zinc-800`}>
+      <div className={`${personalFontClass} flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-zinc-200`}>
         <div className="flex items-center gap-4">
           {personalInfo.photo && (
             <img
               src={personalInfo.photo}
               alt={personalInfo.name}
-              className="w-20 h-20 rounded-xl object-cover border border-zinc-200 dark:border-zinc-800"
+              className="w-20 h-20 rounded-xl object-cover border border-zinc-200"
             />
           )}
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50" style={{ color: primaryColor }}>
+            <h1 className="text-3xl font-extrabold tracking-tight text-zinc-900" style={{ color: primaryColor }}>
               {personalInfo.name || "Your Name"}
             </h1>
             <p className="text-sm font-semibold tracking-wide text-zinc-500 uppercase mt-1">
@@ -120,7 +119,7 @@ export function TemplateHeader({ state, primaryColor }: SectionProps) {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs text-zinc-600 dark:text-zinc-400">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs text-zinc-600">
           {personalInfo.email && (
             <span className="flex items-center gap-1.5">
               <Mail className="h-3.5 w-3.5" style={{ color: primaryColor }} />
@@ -165,15 +164,15 @@ export function TemplateHeader({ state, primaryColor }: SectionProps) {
   // Minimalist Template Header
   if (template === "minimalist") {
     return (
-      <div className={`${personalFontClass} text-center pb-5 border-b border-zinc-100 dark:border-zinc-900`}>
-        <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+      <div className={`${personalFontClass} text-center pb-5 border-b border-zinc-100`}>
+        <h1 className="text-2xl font-bold tracking-tight text-zinc-900">
           {personalInfo.name || "Your Name"}
         </h1>
         <p className="text-xs font-medium text-zinc-500 uppercase tracking-widest mt-1" style={{ color: primaryColor }}>
           {personalInfo.title || "Job Title"}
         </p>
 
-        <div className="flex flex-wrap justify-center items-center gap-x-4 gap-y-1.5 text-[11px] text-zinc-500 dark:text-zinc-400 mt-3 max-w-xl mx-auto">
+        <div className="flex flex-wrap justify-center items-center gap-x-4 gap-y-1.5 text-[11px] text-zinc-500 mt-3 max-w-xl mx-auto">
           {personalInfo.email && <span>{personalInfo.email}</span>}
           {personalInfo.phone && <span>• {personalInfo.phone}</span>}
           {personalInfo.location && <span>• {personalInfo.location}</span>}
@@ -192,14 +191,14 @@ export function TemplateHeader({ state, primaryColor }: SectionProps) {
         <div className="absolute top-0 left-0 w-2 h-full" style={{ backgroundColor: primaryColor }} />
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-black text-zinc-900 dark:text-zinc-50">
+            <h1 className="text-3xl font-black text-zinc-900">
               {personalInfo.name || "Your Name"}
             </h1>
             <p className="text-sm font-bold tracking-wide mt-1" style={{ color: primaryColor }}>
               {personalInfo.title || "Job Title"}
             </p>
           </div>
-          <div className="flex flex-col gap-1.5 text-xs text-zinc-600 dark:text-zinc-400 md:text-right">
+          <div className="flex flex-col gap-1.5 text-xs text-zinc-600 md:text-right">
             {personalInfo.email && <span>{personalInfo.email}</span>}
             {personalInfo.phone && <span>{personalInfo.phone}</span>}
             {personalInfo.location && <span>{personalInfo.location}</span>}
@@ -218,16 +217,16 @@ export function TemplateHeader({ state, primaryColor }: SectionProps) {
   if (template === "vintageMinimalist") {
     return (
       <div
-        className={`${personalFontClass} border-b border-zinc-300 pb-5 text-center dark:border-zinc-700`}
+        className={`${personalFontClass} border-b border-zinc-300 pb-5 text-center`}
         style={getVintageFontStyle()}
       >
         <h1
-          className="text-[34px] font-normal uppercase tracking-[0.08em] text-zinc-950 dark:text-zinc-50"
+          className="text-[34px] font-normal uppercase tracking-[0.08em] text-zinc-950"
           style={getVintageFontStyle()}
         >
           {personalInfo.name || "Your Name"}
         </h1>
-        <div className="mt-1 flex flex-wrap items-center justify-center gap-x-2 text-[12px] text-zinc-800 dark:text-zinc-200">
+        <div className="mt-1 flex flex-wrap items-center justify-center gap-x-2 text-[12px] text-zinc-800">
           {personalInfo.location && <span>{personalInfo.location}</span>}
           {personalInfo.location && (personalInfo.email || personalInfo.phone || personalInfo.website || personalInfo.github || personalInfo.linkedin) ? <span>&middot;</span> : null}
           {personalInfo.email && <span>{personalInfo.email}</span>}
@@ -246,17 +245,17 @@ export function TemplateHeader({ state, primaryColor }: SectionProps) {
 
   // Professional Template Header (default)
   return (
-    <div className={`${personalFontClass} pb-5 border-b-2 border-zinc-800 dark:border-zinc-200`}>
+    <div className={`${personalFontClass} pb-5 border-b-2 border-zinc-800`}>
       <div className="flex flex-col md:flex-row md:items-end justify-between">
         <div>
-          <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+          <h1 className="text-3xl font-semibold tracking-tight text-zinc-900">
             {personalInfo.name || "Your Name"}
           </h1>
-          <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400 mt-1">
+          <p className="text-sm font-medium text-zinc-600 mt-1">
             {personalInfo.title || "Job Title"}
           </p>
         </div>
-        <div className="flex flex-col text-xs text-zinc-600 dark:text-zinc-400 md:text-right mt-3 md:mt-0">
+        <div className="flex flex-col text-xs text-zinc-600 md:text-right mt-3 md:mt-0">
           {personalInfo.location && <span>{personalInfo.location}</span>}
           {personalInfo.phone && <span>{personalInfo.phone}</span>}
           {personalInfo.email && <span className="font-semibold" style={{ color: primaryColor }}>{personalInfo.email}</span>}
@@ -278,7 +277,7 @@ export function TemplateSectionTitle({ title, primaryColor, template }: { title:
   if (template === "modern") {
     return (
       <div className="mb-3">
-        <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+        <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-900 flex items-center gap-2">
           <span className="w-1.5 h-3.5 rounded" style={{ backgroundColor: primaryColor }} />
           {title}
         </h3>
@@ -288,8 +287,8 @@ export function TemplateSectionTitle({ title, primaryColor, template }: { title:
 
   if (template === "minimalist") {
     return (
-      <div className="mb-3 mt-4 border-b border-zinc-200 dark:border-zinc-800 pb-1">
-        <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-700 dark:text-zinc-300">
+      <div className="mb-3 mt-4 border-b border-zinc-200 pb-1">
+        <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-700">
           {title}
         </h3>
       </div>
@@ -299,7 +298,7 @@ export function TemplateSectionTitle({ title, primaryColor, template }: { title:
   if (template === "creative") {
     return (
       <div className="mb-3.5 mt-5">
-        <h3 className="text-sm font-extrabold text-zinc-900 dark:text-zinc-100 pb-1 border-b-2" style={{ borderColor: `${primaryColor}40` }}>
+        <h3 className="text-sm font-extrabold text-zinc-900 pb-1 border-b-2" style={{ borderColor: `${primaryColor}40` }}>
           <span className="px-2 py-0.5 rounded text-[11px] text-white font-bold mr-2 align-middle" style={{ backgroundColor: primaryColor }}>
             {"//"}
           </span>
@@ -314,7 +313,7 @@ export function TemplateSectionTitle({ title, primaryColor, template }: { title:
       <div className="mb-3 mt-5" style={getVintageFontStyle()}>
         <div className="flex items-center gap-3">
           <h3
-            className="shrink-0 text-[16px] uppercase text-zinc-900 dark:text-zinc-50"
+            className="shrink-0 text-[16px] uppercase text-zinc-900"
             style={{
               ...getVintageFontStyle(),
               fontVariant: "small-caps",
@@ -323,7 +322,7 @@ export function TemplateSectionTitle({ title, primaryColor, template }: { title:
           >
             {title}
           </h3>
-          <div className="mt-1 h-px flex-1 bg-zinc-500 dark:bg-zinc-500" />
+          <div className="mt-1 h-px flex-1 bg-zinc-500" />
         </div>
       </div>
     );
@@ -331,7 +330,7 @@ export function TemplateSectionTitle({ title, primaryColor, template }: { title:
 
   // Professional Template Title
   return (
-    <div className="mb-3 mt-4 border-b border-zinc-300 dark:border-zinc-700 pb-1">
+    <div className="mb-3 mt-4 border-b border-zinc-300 pb-1">
       <h3 className="text-sm font-bold uppercase tracking-wide" style={{ color: primaryColor }}>
         {title}
       </h3>
@@ -355,7 +354,7 @@ export function RenderSummary({ state, primaryColor }: SectionProps) {
       <TemplateSectionTitle title="Professional Summary" primaryColor={primaryColor} template={theme.template} />
       <RichTextDisplay
         content={summary}
-        className={isVintage ? "text-zinc-900 dark:text-zinc-100 leading-[1.45]" : "text-zinc-700 dark:text-zinc-300"}
+        className={isVintage ? "text-zinc-900 leading-[1.45]" : "text-zinc-700"}
       />
     </div>
   );
@@ -379,31 +378,31 @@ export function RenderExperience({ state, primaryColor }: SectionProps) {
             {isVintage ? (
               <>
                 <div className="flex justify-between gap-4">
-                  <span className="text-[13px] font-bold text-zinc-950 dark:text-zinc-50">{exp.company || exp.position}</span>
-                  {exp.location && <span className="text-[12px] text-zinc-900 dark:text-zinc-100">{exp.location}</span>}
+                  <span className="text-[13px] font-bold text-zinc-950">{exp.company || exp.position}</span>
+                  {exp.location && <span className="text-[12px] text-zinc-900">{exp.location}</span>}
                 </div>
                 <div className="flex justify-between gap-4">
-                  <span className="text-[12px] italic text-zinc-900 dark:text-zinc-100">{exp.position || exp.company}</span>
-                  <span className="text-[12px] text-zinc-900 dark:text-zinc-100">
+                  <span className="text-[12px] italic text-zinc-900">{exp.position || exp.company}</span>
+                  <span className="text-[12px] text-zinc-900">
                     {exp.startDate} - {exp.current ? "Present" : exp.endDate}
                   </span>
                 </div>
-                <RichTextDisplay content={exp.description} className="mt-2 text-zinc-900 dark:text-zinc-100" />
+                <RichTextDisplay content={exp.description} className="mt-2 text-zinc-900" />
               </>
             ) : (
               <>
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-baseline">
                   <div className="flex flex-wrap items-baseline gap-1.5">
-                    <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                    <span className="text-xs font-bold text-zinc-900">
                       {exp.position}
                     </span>
                     {exp.company && (
-                      <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                        at <span className="font-semibold text-zinc-700 dark:text-zinc-300">{exp.company}</span>
+                      <span className="text-xs text-zinc-500">
+                        at <span className="font-semibold text-zinc-700">{exp.company}</span>
                       </span>
                     )}
                   </div>
-                  <div className="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium">
+                  <div className="text-[10px] text-zinc-500 font-medium">
                     {exp.startDate} – {exp.current ? "Present" : exp.endDate}
                     {exp.location && ` | ${exp.location}`}
                   </div>
@@ -436,12 +435,12 @@ export function RenderEducation({ state, primaryColor }: SectionProps) {
             {isVintage ? (
               <>
                 <div className="flex items-baseline justify-between gap-4">
-                  <div className="text-[13px] font-bold text-zinc-950 dark:text-zinc-50">{edu.school || edu.degree}</div>
-                  <div className="text-[12px] text-zinc-900 dark:text-zinc-100">
+                  <div className="text-[13px] font-bold text-zinc-950">{edu.school || edu.degree}</div>
+                  <div className="text-[12px] text-zinc-900">
                     {edu.startDate} - {edu.current ? "Ongoing" : edu.endDate}
                   </div>
                 </div>
-                <div className="text-[12px] text-zinc-900 dark:text-zinc-100">
+                <div className="text-[12px] text-zinc-900">
                   <span>{edu.degree}</span>
                   {edu.fieldOfStudy && <span> {edu.fieldOfStudy}</span>}
                   {edu.description && <span className="italic"> {edu.description}</span>}
@@ -451,21 +450,21 @@ export function RenderEducation({ state, primaryColor }: SectionProps) {
               <>
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-baseline">
                   <div>
-                    <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100">{edu.degree}</span>
+                    <span className="text-xs font-bold text-zinc-900">{edu.degree}</span>
                     {edu.fieldOfStudy && (
-                      <span className="text-xs text-zinc-600 dark:text-zinc-400"> in {edu.fieldOfStudy}</span>
+                      <span className="text-xs text-zinc-600"> in {edu.fieldOfStudy}</span>
                     )}
                     {edu.school && (
-                      <div className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold">{edu.school}</div>
+                      <div className="text-xs text-zinc-500 font-semibold">{edu.school}</div>
                     )}
                   </div>
-                  <div className="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium">
+                  <div className="text-[10px] text-zinc-500 font-medium">
                     {edu.startDate} – {edu.current ? "Ongoing" : edu.endDate}
                     {edu.location && ` | ${edu.location}`}
                   </div>
                 </div>
                 {edu.description && (
-                  <p className="text-[11px] text-zinc-600 dark:text-zinc-400 pl-1 leading-normal">
+                  <p className="text-[11px] text-zinc-600 pl-1 leading-normal">
                     {edu.description}
                   </p>
                 )}
@@ -495,7 +494,7 @@ export function RenderProjects({ state, primaryColor }: SectionProps) {
           <div key={proj.id} className="space-y-1">
             {isVintage ? (
               <>
-                <div className="flex flex-wrap items-baseline gap-x-2 text-[12px] text-zinc-900 dark:text-zinc-100">
+                <div className="flex flex-wrap items-baseline gap-x-2 text-[12px] text-zinc-900">
                   <span className="font-bold">{proj.name}</span>
                   {proj.role && <span>({proj.role})</span>}
                   {proj.url && (
@@ -504,20 +503,20 @@ export function RenderProjects({ state, primaryColor }: SectionProps) {
                     </a>
                   )}
                 </div>
-                <RichTextDisplay content={proj.description} className="mt-1 text-zinc-900 dark:text-zinc-100" />
+                <RichTextDisplay content={proj.description} className="mt-1 text-zinc-900" />
               </>
             ) : (
               <>
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-baseline">
                   <div className="flex flex-wrap items-baseline gap-2">
-                    <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100">{proj.name}</span>
+                    <span className="text-xs font-bold text-zinc-900">{proj.name}</span>
                     {proj.role && <span className="text-[10px] text-zinc-500 font-medium">({proj.role})</span>}
                     {proj.url && (
                       <a
                         href={proj.url}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-[10px] text-blue-600 dark:text-blue-400 hover:underline"
+                        className="text-[10px] text-blue-600 hover:underline"
                       >
                         Link
                       </a>
@@ -556,11 +555,11 @@ export function RenderSkills({ state, primaryColor }: SectionProps) {
           const tags = category.skills.split(",").map(t => t.trim()).filter(Boolean);
           return (
             <div key={category.id} className="flex flex-col sm:flex-row sm:items-baseline gap-2 text-xs">
-              <span className={isVintage ? "sm:w-[240px] shrink-0 text-[12px] text-zinc-950 dark:text-zinc-50" : "font-bold text-zinc-800 dark:text-zinc-200 sm:w-1/4 shrink-0"}>
+              <span className={isVintage ? "sm:w-[240px] shrink-0 text-[12px] text-zinc-950" : "font-bold text-zinc-800 sm:w-1/4 shrink-0"}>
                 {category.name}:
               </span>
               {isVintage ? (
-                <div className="text-[12px] text-zinc-900 dark:text-zinc-100 sm:w-[calc(100%-240px)]">
+                <div className="text-[12px] text-zinc-900 sm:w-[calc(100%-240px)]">
                   {tags.join(", ")}
                 </div>
               ) : (
@@ -568,7 +567,7 @@ export function RenderSkills({ state, primaryColor }: SectionProps) {
                   {tags.map((tag, idx) => (
                     <span
                       key={idx}
-                      className="px-2 py-0.5 bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-350 text-[10px] font-medium rounded border border-zinc-200 dark:border-zinc-800/80"
+                      className="px-2 py-0.5 bg-zinc-100 text-zinc-700 text-[10px] font-medium rounded border border-zinc-200"
                     >
                       {tag}
                     </span>
@@ -598,9 +597,9 @@ export function RenderLanguages({ state, primaryColor }: SectionProps) {
       <div className={isVintage ? "flex flex-wrap gap-x-8 gap-y-3 text-xs" : "flex flex-wrap gap-x-6 gap-y-2 text-xs"}>
         {activeLangs.map((lang) => (
           <div key={lang.id} className="flex items-center gap-2">
-            <span className={isVintage ? "font-semibold text-zinc-900 dark:text-zinc-100" : "font-bold text-zinc-850 dark:text-zinc-150"}>{lang.name}</span>
+            <span className={isVintage ? "font-semibold text-zinc-900" : "font-bold text-zinc-850"}>{lang.name}</span>
             {lang.proficiency && (
-              <span className={isVintage ? "text-[11px] italic text-zinc-700 dark:text-zinc-300" : "text-[10px] text-zinc-500 font-semibold bg-zinc-100 dark:bg-zinc-900 px-1.5 py-0.5 rounded border border-zinc-150 dark:border-zinc-800"}>
+              <span className={isVintage ? "text-[11px] italic text-zinc-700" : "text-[10px] text-zinc-500 font-semibold bg-zinc-100 px-1.5 py-0.5 rounded border border-zinc-150"}>
                 {lang.proficiency}
               </span>
             )}
@@ -627,11 +626,11 @@ export function RenderCertifications({ state, primaryColor }: SectionProps) {
         {activeCerts.map((cert) => (
           <div key={cert.id} className="flex justify-between items-baseline text-xs">
             <div>
-              <span className={isVintage ? "font-semibold text-zinc-900 dark:text-zinc-100" : "font-bold text-zinc-900 dark:text-zinc-100"}>{cert.name}</span>
-              {cert.issuer && <span className={isVintage ? "text-zinc-800 dark:text-zinc-200" : "text-zinc-500 dark:text-zinc-400"}> – {cert.issuer}</span>}
+              <span className={isVintage ? "font-semibold text-zinc-900" : "font-bold text-zinc-900"}>{cert.name}</span>
+              {cert.issuer && <span className={isVintage ? "text-zinc-800" : "text-zinc-500"}> – {cert.issuer}</span>}
             </div>
             {cert.date && (
-              <span className={isVintage ? "text-[12px] text-zinc-900 dark:text-zinc-100" : "text-[10px] text-zinc-500 font-semibold"}>{cert.date}</span>
+              <span className={isVintage ? "text-[12px] text-zinc-900" : "text-[10px] text-zinc-500 font-semibold"}>{cert.date}</span>
             )}
           </div>
         ))}
