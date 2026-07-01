@@ -118,6 +118,7 @@ function CustomizeTemplateForm() {
     { name: "Clean Minimalist", value: "minimalist" },
     { name: "Corporate Professional", value: "professional" },
     { name: "Creative Bold", value: "creative" },
+    { name: "Vintage Minimilist", value: "vintageMinimalist" },
   ];
 
   const COLOR_PRESETS = [

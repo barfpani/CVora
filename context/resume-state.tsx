@@ -91,7 +91,7 @@ export interface ResumeState {
   sectionsOrder: string[];
   visibleSections: Record<string, boolean>;
   theme: {
-    template: 'modern' | 'minimalist' | 'creative' | 'professional';
+    template: 'modern' | 'minimalist' | 'creative' | 'professional' | 'vintageMinimalist';
     primaryColor: string;
     font: ResumeFont;
     documentName: string;

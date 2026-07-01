@@ -71,6 +71,25 @@ function getSectionTextStyle(state: ResumeState): React.CSSProperties {
   };
 }
 
+function isVintageMinimalistTemplate(state: ResumeState) {
+  return state.theme.template === "vintageMinimalist";
+}
+
+function getVintageFontStyle(): React.CSSProperties {
+  return {
+    fontFamily: '"Latin Modern Roman", "CMU Serif", "Computer Modern Serif", var(--font-merriweather), serif',
+    color: "#111111",
+  };
+}
+
+function getVintageSectionStyle(state: ResumeState): React.CSSProperties {
+  return {
+    ...getSectionTextStyle(state),
+    ...getVintageFontStyle(),
+    lineHeight: 1.35,
+  };
+}
+
 // -------------------------------------------------------------
 // TEMPLATE HEADER RENDERER
 // -------------------------------------------------------------
@@ -196,6 +215,35 @@ export function TemplateHeader({ state, primaryColor }: SectionProps) {
     );
   }
 
+  if (template === "vintageMinimalist") {
+    return (
+      <div
+        className={`${personalFontClass} border-b border-zinc-300 pb-5 text-center dark:border-zinc-700`}
+        style={getVintageFontStyle()}
+      >
+        <h1
+          className="text-[34px] font-normal uppercase tracking-[0.08em] text-zinc-950 dark:text-zinc-50"
+          style={getVintageFontStyle()}
+        >
+          {personalInfo.name || "Your Name"}
+        </h1>
+        <div className="mt-1 flex flex-wrap items-center justify-center gap-x-2 text-[12px] text-zinc-800 dark:text-zinc-200">
+          {personalInfo.location && <span>{personalInfo.location}</span>}
+          {personalInfo.location && (personalInfo.email || personalInfo.phone || personalInfo.website || personalInfo.github || personalInfo.linkedin) ? <span>&middot;</span> : null}
+          {personalInfo.email && <span>{personalInfo.email}</span>}
+          {personalInfo.email && (personalInfo.phone || personalInfo.website || personalInfo.github || personalInfo.linkedin) ? <span>&middot;</span> : null}
+          {personalInfo.phone && <span>{personalInfo.phone}</span>}
+          {personalInfo.phone && (personalInfo.website || personalInfo.github || personalInfo.linkedin) ? <span>&middot;</span> : null}
+          {personalInfo.website && <span>{personalInfo.website}</span>}
+          {personalInfo.website && (personalInfo.github || personalInfo.linkedin) ? <span>&middot;</span> : null}
+          {personalInfo.github && <span>{personalInfo.github}</span>}
+          {personalInfo.github && personalInfo.linkedin ? <span>&middot;</span> : null}
+          {personalInfo.linkedin && <span>{personalInfo.linkedin}</span>}
+        </div>
+      </div>
+    );
+  }
+
   // Professional Template Header (default)
   return (
     <div className={`${personalFontClass} pb-5 border-b-2 border-zinc-800 dark:border-zinc-200`}>
@@ -261,6 +309,26 @@ export function TemplateSectionTitle({ title, primaryColor, template }: { title:
     );
   }
 
+  if (template === "vintageMinimalist") {
+    return (
+      <div className="mb-3 mt-5" style={getVintageFontStyle()}>
+        <div className="flex items-center gap-3">
+          <h3
+            className="shrink-0 text-[16px] uppercase text-zinc-900 dark:text-zinc-50"
+            style={{
+              ...getVintageFontStyle(),
+              fontVariant: "small-caps",
+              letterSpacing: "0.03em",
+            }}
+          >
+            {title}
+          </h3>
+          <div className="mt-1 h-px flex-1 bg-zinc-500 dark:bg-zinc-500" />
+        </div>
+      </div>
+    );
+  }
+
   // Professional Template Title
   return (
     <div className="mb-3 mt-4 border-b border-zinc-300 dark:border-zinc-700 pb-1">
@@ -277,11 +345,18 @@ export function TemplateSectionTitle({ title, primaryColor, template }: { title:
 export function RenderSummary({ state, primaryColor }: SectionProps) {
   const { summary, theme } = state;
   if (!summary || summary.trim() === "<p></p>" || summary.trim() === "") return null;
+  const isVintage = isVintageMinimalistTemplate(state);
 
   return (
-    <div className={`resume-section ${getSectionFontClass(state, "summary")}`} style={getSectionTextStyle(state)}>
+    <div
+      className={`resume-section ${getSectionFontClass(state, "summary")}`}
+      style={isVintage ? getVintageSectionStyle(state) : getSectionTextStyle(state)}
+    >
       <TemplateSectionTitle title="Professional Summary" primaryColor={primaryColor} template={theme.template} />
-      <RichTextDisplay content={summary} className="text-zinc-700 dark:text-zinc-300" />
+      <RichTextDisplay
+        content={summary}
+        className={isVintage ? "text-zinc-900 dark:text-zinc-100 leading-[1.45]" : "text-zinc-700 dark:text-zinc-300"}
+      />
     </div>
   );
 }
@@ -290,30 +365,52 @@ export function RenderExperience({ state, primaryColor }: SectionProps) {
   const { workExperience, theme } = state;
   const activeExps = workExperience.filter(exp => exp.company || exp.position);
   if (activeExps.length === 0) return null;
+  const isVintage = isVintageMinimalistTemplate(state);
 
   return (
-    <div className={`resume-section ${getSectionFontClass(state, "workExperience")}`} style={getSectionTextStyle(state)}>
+    <div
+      className={`resume-section ${getSectionFontClass(state, "workExperience")}`}
+      style={isVintage ? getVintageSectionStyle(state) : getSectionTextStyle(state)}
+    >
       <TemplateSectionTitle title="Work Experience" primaryColor={primaryColor} template={theme.template} />
-      <div className="space-y-4">
+      <div className={isVintage ? "space-y-5" : "space-y-4"}>
         {activeExps.map((exp) => (
           <div key={exp.id} className="space-y-1">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-baseline">
-              <div className="flex flex-wrap items-baseline gap-1.5">
-                <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
-                  {exp.position}
-                </span>
-                {exp.company && (
-                  <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                    at <span className="font-semibold text-zinc-700 dark:text-zinc-300">{exp.company}</span>
+            {isVintage ? (
+              <>
+                <div className="flex justify-between gap-4">
+                  <span className="text-[13px] font-bold text-zinc-950 dark:text-zinc-50">{exp.company || exp.position}</span>
+                  {exp.location && <span className="text-[12px] text-zinc-900 dark:text-zinc-100">{exp.location}</span>}
+                </div>
+                <div className="flex justify-between gap-4">
+                  <span className="text-[12px] italic text-zinc-900 dark:text-zinc-100">{exp.position || exp.company}</span>
+                  <span className="text-[12px] text-zinc-900 dark:text-zinc-100">
+                    {exp.startDate} - {exp.current ? "Present" : exp.endDate}
                   </span>
-                )}
-              </div>
-              <div className="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium">
-                {exp.startDate} – {exp.current ? "Present" : exp.endDate}
-                {exp.location && ` | ${exp.location}`}
-              </div>
-            </div>
-            <RichTextDisplay content={exp.description} className="mt-1 pl-1" />
+                </div>
+                <RichTextDisplay content={exp.description} className="mt-2 text-zinc-900 dark:text-zinc-100" />
+              </>
+            ) : (
+              <>
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-baseline">
+                  <div className="flex flex-wrap items-baseline gap-1.5">
+                    <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                      {exp.position}
+                    </span>
+                    {exp.company && (
+                      <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                        at <span className="font-semibold text-zinc-700 dark:text-zinc-300">{exp.company}</span>
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium">
+                    {exp.startDate} – {exp.current ? "Present" : exp.endDate}
+                    {exp.location && ` | ${exp.location}`}
+                  </div>
+                </div>
+                <RichTextDisplay content={exp.description} className="mt-1 pl-1" />
+              </>
+            )}
           </div>
         ))}
       </div>
@@ -325,32 +422,54 @@ export function RenderEducation({ state, primaryColor }: SectionProps) {
   const { education, theme } = state;
   const activeEdu = education.filter(edu => edu.school || edu.degree);
   if (activeEdu.length === 0) return null;
+  const isVintage = isVintageMinimalistTemplate(state);
 
   return (
-    <div className={`resume-section ${getSectionFontClass(state, "education")}`} style={getSectionTextStyle(state)}>
+    <div
+      className={`resume-section ${getSectionFontClass(state, "education")}`}
+      style={isVintage ? getVintageSectionStyle(state) : getSectionTextStyle(state)}
+    >
       <TemplateSectionTitle title="Education" primaryColor={primaryColor} template={theme.template} />
-      <div className="space-y-3">
+      <div className={isVintage ? "space-y-4" : "space-y-3"}>
         {activeEdu.map((edu) => (
           <div key={edu.id} className="space-y-1">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-baseline">
-              <div>
-                <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100">{edu.degree}</span>
-                {edu.fieldOfStudy && (
-                  <span className="text-xs text-zinc-600 dark:text-zinc-400"> in {edu.fieldOfStudy}</span>
+            {isVintage ? (
+              <>
+                <div className="flex items-baseline justify-between gap-4">
+                  <div className="text-[13px] font-bold text-zinc-950 dark:text-zinc-50">{edu.school || edu.degree}</div>
+                  <div className="text-[12px] text-zinc-900 dark:text-zinc-100">
+                    {edu.startDate} - {edu.current ? "Ongoing" : edu.endDate}
+                  </div>
+                </div>
+                <div className="text-[12px] text-zinc-900 dark:text-zinc-100">
+                  <span>{edu.degree}</span>
+                  {edu.fieldOfStudy && <span> {edu.fieldOfStudy}</span>}
+                  {edu.description && <span className="italic"> {edu.description}</span>}
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-baseline">
+                  <div>
+                    <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100">{edu.degree}</span>
+                    {edu.fieldOfStudy && (
+                      <span className="text-xs text-zinc-600 dark:text-zinc-400"> in {edu.fieldOfStudy}</span>
+                    )}
+                    {edu.school && (
+                      <div className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold">{edu.school}</div>
+                    )}
+                  </div>
+                  <div className="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium">
+                    {edu.startDate} – {edu.current ? "Ongoing" : edu.endDate}
+                    {edu.location && ` | ${edu.location}`}
+                  </div>
+                </div>
+                {edu.description && (
+                  <p className="text-[11px] text-zinc-600 dark:text-zinc-400 pl-1 leading-normal">
+                    {edu.description}
+                  </p>
                 )}
-                {edu.school && (
-                  <div className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold">{edu.school}</div>
-                )}
-              </div>
-              <div className="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium">
-                {edu.startDate} – {edu.current ? "Ongoing" : edu.endDate}
-                {edu.location && ` | ${edu.location}`}
-              </div>
-            </div>
-            {edu.description && (
-              <p className="text-[11px] text-zinc-600 dark:text-zinc-400 pl-1 leading-normal">
-                {edu.description}
-              </p>
+              </>
             )}
           </div>
         ))}
@@ -363,35 +482,56 @@ export function RenderProjects({ state, primaryColor }: SectionProps) {
   const { projects, theme } = state;
   const activeProjs = projects.filter(p => p.name);
   if (activeProjs.length === 0) return null;
+  const isVintage = isVintageMinimalistTemplate(state);
 
   return (
-    <div className={`resume-section ${getSectionFontClass(state, "projects")}`} style={getSectionTextStyle(state)}>
+    <div
+      className={`resume-section ${getSectionFontClass(state, "projects")}`}
+      style={isVintage ? getVintageSectionStyle(state) : getSectionTextStyle(state)}
+    >
       <TemplateSectionTitle title="Projects" primaryColor={primaryColor} template={theme.template} />
-      <div className="space-y-4">
+      <div className={isVintage ? "space-y-5" : "space-y-4"}>
         {activeProjs.map((proj) => (
           <div key={proj.id} className="space-y-1">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-baseline">
-              <div className="flex flex-wrap items-baseline gap-2">
-                <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100">{proj.name}</span>
-                {proj.role && <span className="text-[10px] text-zinc-500 font-medium">({proj.role})</span>}
-                {proj.url && (
-                  <a
-                    href={proj.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-[10px] text-blue-600 dark:text-blue-400 hover:underline"
-                  >
-                    Link
-                  </a>
-                )}
-              </div>
-              {proj.technologies && (
-                <div className="text-[10px] text-zinc-500 font-semibold max-w-xs truncate">
-                  {proj.technologies}
+            {isVintage ? (
+              <>
+                <div className="flex flex-wrap items-baseline gap-x-2 text-[12px] text-zinc-900 dark:text-zinc-100">
+                  <span className="font-bold">{proj.name}</span>
+                  {proj.role && <span>({proj.role})</span>}
+                  {proj.url && (
+                    <a href={proj.url} target="_blank" rel="noreferrer" className="hover:underline">
+                      {proj.url}
+                    </a>
+                  )}
                 </div>
-              )}
-            </div>
-            <RichTextDisplay content={proj.description} className="mt-1 pl-1" />
+                <RichTextDisplay content={proj.description} className="mt-1 text-zinc-900 dark:text-zinc-100" />
+              </>
+            ) : (
+              <>
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-baseline">
+                  <div className="flex flex-wrap items-baseline gap-2">
+                    <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100">{proj.name}</span>
+                    {proj.role && <span className="text-[10px] text-zinc-500 font-medium">({proj.role})</span>}
+                    {proj.url && (
+                      <a
+                        href={proj.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-[10px] text-blue-600 dark:text-blue-400 hover:underline"
+                      >
+                        Link
+                      </a>
+                    )}
+                  </div>
+                  {proj.technologies && (
+                    <div className="text-[10px] text-zinc-500 font-semibold max-w-xs truncate">
+                      {proj.technologies}
+                    </div>
+                  )}
+                </div>
+                <RichTextDisplay content={proj.description} className="mt-1 pl-1" />
+              </>
+            )}
           </div>
         ))}
       </div>
@@ -403,28 +543,38 @@ export function RenderSkills({ state, primaryColor }: SectionProps) {
   const { skills, theme } = state;
   const activeSkills = skills.filter(s => s.name && s.skills);
   if (activeSkills.length === 0) return null;
+  const isVintage = isVintageMinimalistTemplate(state);
 
   return (
-    <div className={`resume-section ${getSectionFontClass(state, "skills")}`} style={getSectionTextStyle(state)}>
+    <div
+      className={`resume-section ${getSectionFontClass(state, "skills")}`}
+      style={isVintage ? getVintageSectionStyle(state) : getSectionTextStyle(state)}
+    >
       <TemplateSectionTitle title="Skills" primaryColor={primaryColor} template={theme.template} />
-      <div className="space-y-2">
+      <div className={isVintage ? "space-y-3" : "space-y-2"}>
         {activeSkills.map((category) => {
           const tags = category.skills.split(",").map(t => t.trim()).filter(Boolean);
           return (
             <div key={category.id} className="flex flex-col sm:flex-row sm:items-baseline gap-2 text-xs">
-              <span className="font-bold text-zinc-800 dark:text-zinc-200 sm:w-1/4 shrink-0">
+              <span className={isVintage ? "sm:w-[240px] shrink-0 text-[12px] text-zinc-950 dark:text-zinc-50" : "font-bold text-zinc-800 dark:text-zinc-200 sm:w-1/4 shrink-0"}>
                 {category.name}:
               </span>
-              <div className="flex flex-wrap gap-1.5 sm:w-3/4">
-                {tags.map((tag, idx) => (
-                  <span
-                    key={idx}
-                    className="px-2 py-0.5 bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-350 text-[10px] font-medium rounded border border-zinc-200 dark:border-zinc-800/80"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
+              {isVintage ? (
+                <div className="text-[12px] text-zinc-900 dark:text-zinc-100 sm:w-[calc(100%-240px)]">
+                  {tags.join(", ")}
+                </div>
+              ) : (
+                <div className="flex flex-wrap gap-1.5 sm:w-3/4">
+                  {tags.map((tag, idx) => (
+                    <span
+                      key={idx}
+                      className="px-2 py-0.5 bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-350 text-[10px] font-medium rounded border border-zinc-200 dark:border-zinc-800/80"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           );
         })}
@@ -437,16 +587,20 @@ export function RenderLanguages({ state, primaryColor }: SectionProps) {
   const { languages, theme } = state;
   const activeLangs = languages.filter(l => l.name);
   if (activeLangs.length === 0) return null;
+  const isVintage = isVintageMinimalistTemplate(state);
 
   return (
-    <div className={`resume-section ${getSectionFontClass(state, "languages")}`} style={getSectionTextStyle(state)}>
+    <div
+      className={`resume-section ${getSectionFontClass(state, "languages")}`}
+      style={isVintage ? getVintageSectionStyle(state) : getSectionTextStyle(state)}
+    >
       <TemplateSectionTitle title="Languages" primaryColor={primaryColor} template={theme.template} />
-      <div className="flex flex-wrap gap-x-6 gap-y-2 text-xs">
+      <div className={isVintage ? "flex flex-wrap gap-x-8 gap-y-3 text-xs" : "flex flex-wrap gap-x-6 gap-y-2 text-xs"}>
         {activeLangs.map((lang) => (
           <div key={lang.id} className="flex items-center gap-2">
-            <span className="font-bold text-zinc-850 dark:text-zinc-150">{lang.name}</span>
+            <span className={isVintage ? "font-semibold text-zinc-900 dark:text-zinc-100" : "font-bold text-zinc-850 dark:text-zinc-150"}>{lang.name}</span>
             {lang.proficiency && (
-              <span className="text-[10px] text-zinc-500 font-semibold bg-zinc-100 dark:bg-zinc-900 px-1.5 py-0.5 rounded border border-zinc-150 dark:border-zinc-800">
+              <span className={isVintage ? "text-[11px] italic text-zinc-700 dark:text-zinc-300" : "text-[10px] text-zinc-500 font-semibold bg-zinc-100 dark:bg-zinc-900 px-1.5 py-0.5 rounded border border-zinc-150 dark:border-zinc-800"}>
                 {lang.proficiency}
               </span>
             )}
@@ -461,19 +615,23 @@ export function RenderCertifications({ state, primaryColor }: SectionProps) {
   const { certifications, theme } = state;
   const activeCerts = certifications.filter(c => c.name);
   if (activeCerts.length === 0) return null;
+  const isVintage = isVintageMinimalistTemplate(state);
 
   return (
-    <div className={`resume-section ${getSectionFontClass(state, "certifications")}`} style={getSectionTextStyle(state)}>
+    <div
+      className={`resume-section ${getSectionFontClass(state, "certifications")}`}
+      style={isVintage ? getVintageSectionStyle(state) : getSectionTextStyle(state)}
+    >
       <TemplateSectionTitle title="Certifications & Awards" primaryColor={primaryColor} template={theme.template} />
-      <div className="space-y-2">
+      <div className={isVintage ? "space-y-3" : "space-y-2"}>
         {activeCerts.map((cert) => (
           <div key={cert.id} className="flex justify-between items-baseline text-xs">
             <div>
-              <span className="font-bold text-zinc-900 dark:text-zinc-100">{cert.name}</span>
-              {cert.issuer && <span className="text-zinc-500 dark:text-zinc-400"> – {cert.issuer}</span>}
+              <span className={isVintage ? "font-semibold text-zinc-900 dark:text-zinc-100" : "font-bold text-zinc-900 dark:text-zinc-100"}>{cert.name}</span>
+              {cert.issuer && <span className={isVintage ? "text-zinc-800 dark:text-zinc-200" : "text-zinc-500 dark:text-zinc-400"}> – {cert.issuer}</span>}
             </div>
             {cert.date && (
-              <span className="text-[10px] text-zinc-500 font-semibold">{cert.date}</span>
+              <span className={isVintage ? "text-[12px] text-zinc-900 dark:text-zinc-100" : "text-[10px] text-zinc-500 font-semibold"}>{cert.date}</span>
             )}
           </div>
         ))}
