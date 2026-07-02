@@ -66,7 +66,7 @@ export function getSectionFontClass(state: ResumeState, sectionId: SectionFontKe
 
 function getSectionTextStyle(state: ResumeState): React.CSSProperties {
   return {
-    fontSize: `${state.theme.contentFontSize}px`,
+    fontSize: "12px",
     lineHeight: 1.45,
   };
 }

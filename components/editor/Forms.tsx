@@ -138,13 +138,6 @@ function CustomizeTemplateForm() {
     dispatch({ type: "UPDATE_THEME", payload: { [field]: value } });
   };
 
-  const handleContentFontSizeChange = (value: number) => {
-    dispatch({
-      type: "UPDATE_THEME",
-      payload: { contentFontSize: value },
-    });
-  };
-
   const handleSectionFontChange = (sectionId: SectionFontKey, value: string) => {
     dispatch({
       type: "UPDATE_THEME",
@@ -250,31 +243,9 @@ function CustomizeTemplateForm() {
         <div>
           <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Font Customization</h3>
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            Choose font size for the entire resume and select fonts independently for each section.
+            Select fonts independently for each section.
           </p>
         </div>
-      </div>
-
-      <div className="space-y-2 rounded-lg border border-zinc-200 dark:border-zinc-800 p-4">
-        <div className="flex items-center justify-between gap-3">
-          <label className="text-[11px] font-bold text-zinc-550 uppercase tracking-wide flex items-center gap-1.5">
-            <TextCursorInput className="h-3.5 w-3.5 text-zinc-400" />
-            Font Size
-          </label>
-          <span className="text-[11px] font-semibold text-zinc-500">{theme.contentFontSize}px</span>
-        </div>
-        <input
-          type="range"
-          min={7}
-          max={15}
-          step={0.1}
-          value={theme.contentFontSize}
-          onChange={(e) => handleContentFontSizeChange(Number(e.target.value))}
-          className="w-full accent-blue-600"
-        />
-        <p className="text-[11px] text-zinc-500">
-          Applies to all resume sections below the personal details header.
-        </p>
       </div>
 
       <div className="space-y-2 rounded-lg border border-zinc-200 dark:border-zinc-800 p-4">

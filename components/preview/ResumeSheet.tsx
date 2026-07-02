@@ -99,7 +99,6 @@ export default function ResumeSheet({ onPageCountChange }: ResumeSheetProps) {
           template: state.theme.template,
           primaryColor: state.theme.primaryColor,
           font: state.theme.font,
-          contentFontSize: state.theme.contentFontSize,
           sectionFonts: state.theme.sectionFonts,
         },
       }),
@@ -111,7 +110,6 @@ export default function ResumeSheet({ onPageCountChange }: ResumeSheetProps) {
       state.projects,
       state.skills,
       state.summary,
-      state.theme.contentFontSize,
       state.theme.font,
       state.theme.primaryColor,
       state.theme.sectionFonts,
@@ -207,12 +205,12 @@ function PageFrame({ children, className, contentRef, primaryColor, showHeader, 
         <>
           <TemplateHeader state={state} primaryColor={primaryColor} />
           <div ref={contentRef} className="mt-5 min-h-0 flex-1 overflow-hidden">
-            <div className="space-y-4">{children}</div>
+            <div className="space-y-0">{children}</div>
           </div>
         </>
       ) : (
         <div ref={contentRef} className="min-h-0 flex-1 overflow-hidden">
-          <div className="space-y-4">{children}</div>
+          <div className="space-y-0">{children}</div>
         </div>
       )}
     </div>
