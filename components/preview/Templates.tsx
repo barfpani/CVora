@@ -77,7 +77,7 @@ function isVintageMinimalistTemplate(state: ResumeState) {
 
 function getVintageFontStyle(): React.CSSProperties {
   return {
-    fontFamily: '"Latin Modern Roman", "CMU Serif", "Computer Modern Serif", var(--font-merriweather), serif',
+    fontFamily: "var(--font-computer-modern), var(--font-merriweather), serif",
   };
 }
 
@@ -221,7 +221,7 @@ export function TemplateHeader({ state, primaryColor }: SectionProps) {
         style={getVintageFontStyle()}
       >
         <h1
-          className="text-[34px] font-normal uppercase tracking-[0.08em] text-zinc-950"
+          className="text-[34px] font-normal uppercase tracking-[0.01em] text-zinc-950"
           style={getVintageFontStyle()}
         >
           {personalInfo.name || "Your Name"}
@@ -313,7 +313,7 @@ export function TemplateSectionTitle({ title, primaryColor, template }: { title:
       <div className="mb-3 mt-5" style={getVintageFontStyle()}>
         <div className="flex items-center gap-3">
           <h3
-            className="shrink-0 text-[16px] uppercase text-zinc-900"
+            className="shrink-0 text-[16px] font-bold text-zinc-900"
             style={{
               ...getVintageFontStyle(),
               fontVariant: "small-caps",
@@ -550,7 +550,7 @@ export function RenderSkills({ state, primaryColor }: SectionProps) {
       style={isVintage ? getVintageSectionStyle(state) : getSectionTextStyle(state)}
     >
       <TemplateSectionTitle title="Skills" primaryColor={primaryColor} template={theme.template} />
-      <div className={isVintage ? "space-y-3" : "space-y-2"}>
+      <div className={isVintage ? "space-y-1" : "space-y-2"}>
         {activeSkills.map((category) => {
           const tags = category.skills.split(",").map(t => t.trim()).filter(Boolean);
           return (

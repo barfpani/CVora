@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Merriweather, Roboto_Mono, Outfit, Playfair_Display } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { Providers } from "./providers";
 
@@ -29,6 +30,33 @@ const playfairDisplay = Playfair_Display({
   variable: "--font-playfair",
 });
 
+const computerModern = localFont({
+  src: [
+    {
+      path: "../computer-modern/cmunrm.ttf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../computer-modern/cmunti.ttf",
+      weight: "400",
+      style: "italic",
+    },
+    {
+      path: "../computer-modern/cmunbx.ttf",
+      weight: "700",
+      style: "normal",
+    },
+    {
+      path: "../computer-modern/cmunbi.ttf",
+      weight: "700",
+      style: "italic",
+    },
+  ],
+  variable: "--font-computer-modern",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "Resume Craft",
   description: "Build, customize, and export professional A4 resumes instantly with real-time live preview.",
@@ -42,7 +70,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${merriweather.variable} ${robotoMono.variable} ${outfit.variable} ${playfairDisplay.variable} h-full antialiased`}
+      className={`${inter.variable} ${merriweather.variable} ${robotoMono.variable} ${outfit.variable} ${playfairDisplay.variable} ${computerModern.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-50 transition-colors duration-150">

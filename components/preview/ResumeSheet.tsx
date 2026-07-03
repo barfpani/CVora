@@ -190,6 +190,7 @@ export default function ResumeSheet({ onPageCountChange }: ResumeSheetProps) {
 }
 
 function PageFrame({ children, className, contentRef, primaryColor, showHeader, state }: PageFrameProps) {
+  const isVintageMinimalist = state.theme.template === "vintageMinimalist";
   return (
     <div
       data-resume-page="true"
@@ -204,13 +205,13 @@ function PageFrame({ children, className, contentRef, primaryColor, showHeader, 
       {showHeader ? (
         <>
           <TemplateHeader state={state} primaryColor={primaryColor} />
-          <div ref={contentRef} className="mt-5 min-h-0 flex-1 overflow-hidden">
-            <div className="space-y-0">{children}</div>
+          <div ref={contentRef} className={isVintageMinimalist ? "mt-[-15px] min-h-0 flex-1 overflow-hidden" : " mt-2 min-h-0 flex-1 overflow-hidden"}>
+            <div className={isVintageMinimalist ? "space-y-[-15px]" : "space-y-1"}>{children}</div>
           </div>
         </>
       ) : (
         <div ref={contentRef} className="min-h-0 flex-1 overflow-hidden">
-          <div className="space-y-0">{children}</div>
+          <div className={isVintageMinimalist ? "space-y-[-15px]" : "space-y-1"}>{children}</div>
         </div>
       )}
     </div>

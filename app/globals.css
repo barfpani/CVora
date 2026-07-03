@@ -20,6 +20,7 @@
   --font-roboto-mono: var(--font-roboto-mono), monospace;
   --font-outfit: var(--font-outfit), sans-serif;
   --font-playfair: var(--font-playfair), serif;
+  --font-computer-modern: var(--font-computer-modern), serif;
 }
 
 body {

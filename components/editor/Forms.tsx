@@ -65,7 +65,7 @@ export default function EditorPanel() {
     { id: "skills", label: "Skills", icon: Cpu },
     { id: "languages", label: "Languages", icon: Languages },
     { id: "certifications", label: "Certifications", icon: Award },
-    { id: "visibility", label: "Sections Order", icon: Settings },
+    { id: "visibility", label: "Sections Visibility", icon: Settings },
   ];
 
   return (
