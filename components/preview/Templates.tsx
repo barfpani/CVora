@@ -494,11 +494,19 @@ export function RenderProjects({ state, primaryColor }: SectionProps) {
           <div key={proj.id} className="space-y-1">
             {isVintage ? (
               <>
-                <div className="flex flex-wrap items-baseline gap-x-2 text-[12px] text-zinc-900">
-                  <span className="font-bold">{proj.name}</span>
-                  {proj.role && <span>({proj.role})</span>}
+                <div className="flex items-baseline justify-between gap-4 text-[12px] text-zinc-900">
+                  <div className="flex flex-wrap items-baseline gap-x-2">
+                    <span className="font-bold">{proj.name}</span>
+                    {proj.role && <span>({proj.role})</span>}
+                    {proj.technologies && <span>{proj.technologies}</span>}
+                  </div>
                   {proj.url && (
-                    <a href={proj.url} target="_blank" rel="noreferrer" className="hover:underline">
+                    <a
+                      href={proj.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="shrink-0 text-right hover:underline"
+                    >
                       {proj.url}
                     </a>
                   )}
@@ -549,7 +557,7 @@ export function RenderSkills({ state, primaryColor }: SectionProps) {
       className={`resume-section ${getSectionFontClass(state, "skills")}`}
       style={isVintage ? getVintageSectionStyle(state) : getSectionTextStyle(state)}
     >
-      <TemplateSectionTitle title="Skills" primaryColor={primaryColor} template={theme.template} />
+      <TemplateSectionTitle title="Technical Skills" primaryColor={primaryColor} template={theme.template} />
       <div className={isVintage ? "space-y-1" : "space-y-2"}>
         {activeSkills.map((category) => {
           const tags = category.skills.split(",").map(t => t.trim()).filter(Boolean);
