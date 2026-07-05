@@ -354,7 +354,7 @@ export function RenderSummary({ state, primaryColor }: SectionProps) {
       <TemplateSectionTitle title="Professional Summary" primaryColor={primaryColor} template={theme.template} />
       <RichTextDisplay
         content={summary}
-        className={isVintage ? "text-zinc-900 leading-[1.45]" : "text-zinc-700"}
+        className={isVintage ? " -mt-3 -mb-0.5 pl-4 text-zinc-900 leading-[1.45]" : "text-zinc-700"}
       />
     </div>
   );
@@ -372,7 +372,7 @@ export function RenderExperience({ state, primaryColor }: SectionProps) {
       style={isVintage ? getVintageSectionStyle(state) : getSectionTextStyle(state)}
     >
       <TemplateSectionTitle title="Work Experience" primaryColor={primaryColor} template={theme.template} />
-      <div className={isVintage ? "space-y-5" : "space-y-4"}>
+      <div className={isVintage ? "-mt-2 -mb-2 pl-4 space-y-2" : "space-y-4"}>
         {activeExps.map((exp) => (
           <div key={exp.id} className="space-y-1">
             {isVintage ? (
@@ -429,7 +429,7 @@ export function RenderEducation({ state, primaryColor }: SectionProps) {
       style={isVintage ? getVintageSectionStyle(state) : getSectionTextStyle(state)}
     >
       <TemplateSectionTitle title="Education" primaryColor={primaryColor} template={theme.template} />
-      <div className={isVintage ? " -mt-2 pl-6 space-y-4" : "space-y-3"}>
+      <div className={isVintage ? " -mt-2 -mb-1 pl-4 space-y-4" : "space-y-3"}>
         {activeEdu.map((edu) => (
           <div key={edu.id} className="space-y-1">
             {isVintage ? (
@@ -489,7 +489,7 @@ export function RenderProjects({ state, primaryColor }: SectionProps) {
       style={isVintage ? getVintageSectionStyle(state) : getSectionTextStyle(state)}
     >
       <TemplateSectionTitle title="Projects" primaryColor={primaryColor} template={theme.template} />
-      <div className={isVintage ? "-mt-1 space-y-3" : "space-y-4"}>
+      <div className={isVintage ? "-mt-2 space-y-2" : "space-y-4"}>
         {activeProjs.map((proj) => (
           <div key={proj.id} className="space-y-1">
             {isVintage ? (
@@ -558,7 +558,7 @@ export function RenderSkills({ state, primaryColor }: SectionProps) {
       style={isVintage ? getVintageSectionStyle(state) : getSectionTextStyle(state)}
     >
       <TemplateSectionTitle title="Technical Skills" primaryColor={primaryColor} template={theme.template} />
-      <div className={isVintage ? "-mt-3 pl-6 space-y-[-0.5px]" : "space-y-2"}>
+      <div className={isVintage ? "-mt-3 pl-4 space-y-[-0.5px]" : "space-y-2"}>
         {activeSkills.map((category) => {
           const tags = category.skills.split(",").map(t => t.trim()).filter(Boolean);
           return (
@@ -602,7 +602,7 @@ export function RenderLanguages({ state, primaryColor }: SectionProps) {
       style={isVintage ? getVintageSectionStyle(state) : getSectionTextStyle(state)}
     >
       <TemplateSectionTitle title="Languages" primaryColor={primaryColor} template={theme.template} />
-      <div className={isVintage ? "flex flex-wrap gap-x-8 gap-y-3 text-xs" : "flex flex-wrap gap-x-6 gap-y-2 text-xs"}>
+      <div className={isVintage ? " -mt-2 flex flex-wrap gap-x-10 gap-y-3 text-xs" : "flex flex-wrap gap-x-6 gap-y-2 text-xs"}>
         {activeLangs.map((lang) => (
           <div key={lang.id} className="flex items-center gap-2">
             <span className={isVintage ? "font-semibold text-zinc-900" : "font-bold text-zinc-850"}>{lang.name}</span>
@@ -630,7 +630,7 @@ export function RenderCertifications({ state, primaryColor }: SectionProps) {
       style={isVintage ? getVintageSectionStyle(state) : getSectionTextStyle(state)}
     >
       <TemplateSectionTitle title="Certifications & Awards" primaryColor={primaryColor} template={theme.template} />
-      <div className={isVintage ? "space-y-3" : "space-y-2"}>
+      <div className={isVintage ? "-mt-2 pl-4 space-y-1" : "space-y-2"}>
         {activeCerts.map((cert) => (
           <div key={cert.id} className="flex justify-between items-baseline text-xs">
             <div>
