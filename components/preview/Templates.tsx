@@ -602,7 +602,7 @@ export function RenderLanguages({ state, primaryColor }: SectionProps) {
       style={isVintage ? getVintageSectionStyle(state) : getSectionTextStyle(state)}
     >
       <TemplateSectionTitle title="Languages" primaryColor={primaryColor} template={theme.template} />
-      <div className={isVintage ? " -mt-2 flex flex-wrap gap-x-10 gap-y-3 text-xs" : "flex flex-wrap gap-x-6 gap-y-2 text-xs"}>
+      <div className={isVintage ? " -mt-2 pl-4 flex flex-wrap gap-x-10 gap-y-3 text-xs" : "flex flex-wrap gap-x-6 gap-y-2 text-xs"}>
         {activeLangs.map((lang) => (
           <div key={lang.id} className="flex items-center gap-2">
             <span className={isVintage ? "font-semibold text-zinc-900" : "font-bold text-zinc-850"}>{lang.name}</span>
