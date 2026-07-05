@@ -62,7 +62,7 @@ export default function EditorPanel() {
     { id: "experience", label: "Work Experience", icon: Briefcase },
     { id: "education", label: "Education", icon: GraduationCap },
     { id: "projects", label: "Projects", icon: FolderGit2 },
-    { id: "skills", label: "Skills", icon: Cpu },
+    { id: "skills", label: "Technical Skills", icon: Cpu },
     { id: "languages", label: "Languages", icon: Languages },
     { id: "certifications", label: "Certifications", icon: Award },
     { id: "visibility", label: "Sections Visibility", icon: Settings },

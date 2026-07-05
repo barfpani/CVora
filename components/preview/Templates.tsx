@@ -429,7 +429,7 @@ export function RenderEducation({ state, primaryColor }: SectionProps) {
       style={isVintage ? getVintageSectionStyle(state) : getSectionTextStyle(state)}
     >
       <TemplateSectionTitle title="Education" primaryColor={primaryColor} template={theme.template} />
-      <div className={isVintage ? "space-y-4" : "space-y-3"}>
+      <div className={isVintage ? " -mt-2 pl-6 space-y-4" : "space-y-3"}>
         {activeEdu.map((edu) => (
           <div key={edu.id} className="space-y-1">
             {isVintage ? (
@@ -489,7 +489,7 @@ export function RenderProjects({ state, primaryColor }: SectionProps) {
       style={isVintage ? getVintageSectionStyle(state) : getSectionTextStyle(state)}
     >
       <TemplateSectionTitle title="Projects" primaryColor={primaryColor} template={theme.template} />
-      <div className={isVintage ? "space-y-5" : "space-y-4"}>
+      <div className={isVintage ? "-mt-1 space-y-3" : "space-y-4"}>
         {activeProjs.map((proj) => (
           <div key={proj.id} className="space-y-1">
             {isVintage ? (
@@ -511,7 +511,7 @@ export function RenderProjects({ state, primaryColor }: SectionProps) {
                     </a>
                   )}
                 </div>
-                <RichTextDisplay content={proj.description} className="mt-1 text-zinc-900" />
+                <RichTextDisplay content={proj.description} className="mt-1 pl-1 text-zinc-900" />
               </>
             ) : (
               <>
@@ -558,7 +558,7 @@ export function RenderSkills({ state, primaryColor }: SectionProps) {
       style={isVintage ? getVintageSectionStyle(state) : getSectionTextStyle(state)}
     >
       <TemplateSectionTitle title="Technical Skills" primaryColor={primaryColor} template={theme.template} />
-      <div className={isVintage ? "space-y-1" : "space-y-2"}>
+      <div className={isVintage ? "-mt-3 pl-6 space-y-[-0.5px]" : "space-y-2"}>
         {activeSkills.map((category) => {
           const tags = category.skills.split(",").map(t => t.trim()).filter(Boolean);
           return (
