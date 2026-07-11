@@ -579,6 +579,7 @@ function resumeReducer(state: ResumeState, action: ResumeAction): ResumeState {
 interface ResumeContextType {
   state: ResumeState;
   dispatch: React.Dispatch<ResumeAction>;
+  isLoaded: boolean;
 }
 
 const ResumeContext = createContext<ResumeContextType | undefined>(undefined);
@@ -618,7 +619,7 @@ export function ResumeProvider({ children }: { children: React.ReactNode }) {
   }, [state, isLoaded]);
 
   return (
-    <ResumeContext.Provider value={{ state, dispatch }}>
+    <ResumeContext.Provider value={{ state, dispatch, isLoaded }}>
       {children}
     </ResumeContext.Provider>
   );
