@@ -226,7 +226,10 @@ export function TemplateHeader({ state, primaryColor }: SectionProps) {
         >
           {personalInfo.name || "Your Name"}
         </h1>
-        <div className="mt-1 flex flex-wrap items-center justify-center gap-x-2 text-[12px] text-zinc-800">
+        <p className="text-[12px] font-normal tracking-[0.03em] text-zinc-800 -mt-[9px] -mb-[5px]" style={getVintageFontStyle()}>
+          {personalInfo.title || "Job Title"}
+        </p>
+        <div className=" -mb-[17px] mt-1 flex flex-wrap items-center justify-center gap-x-2 text-[12px] text-zinc-800">
           {personalInfo.location && <span>{personalInfo.location}</span>}
           {personalInfo.location && (personalInfo.email || personalInfo.phone || personalInfo.website || personalInfo.github || personalInfo.linkedin) ? <span>&middot;</span> : null}
           {personalInfo.email && <span>{personalInfo.email}</span>}
@@ -310,7 +313,7 @@ export function TemplateSectionTitle({ title, primaryColor, template }: { title:
 
   if (template === "vintageMinimalist") {
     return (
-      <div className="mb-3 mt-5" style={getVintageFontStyle()}>
+      <div className="mb-3 mt-3" style={getVintageFontStyle()}>
         <div className="flex items-center gap-3">
           <h3
             className="shrink-0 text-[16px] font-bold text-zinc-900"
@@ -322,7 +325,7 @@ export function TemplateSectionTitle({ title, primaryColor, template }: { title:
           >
             {title}
           </h3>
-          <div className="mt-1 h-px flex-1 bg-zinc-500" />
+          <div className="mt-0 h-px flex-1 bg-zinc-500" />
         </div>
       </div>
     );
@@ -429,9 +432,9 @@ export function RenderEducation({ state, primaryColor }: SectionProps) {
       style={isVintage ? getVintageSectionStyle(state) : getSectionTextStyle(state)}
     >
       <TemplateSectionTitle title="Education" primaryColor={primaryColor} template={theme.template} />
-      <div className={isVintage ? " -mt-2 -mb-1 pl-4 space-y-4" : "space-y-3"}>
+      <div className={isVintage ? " -mt-3 -mb-1 pl-4 space-y-4" : "space-y-3"}>
         {activeEdu.map((edu) => (
-          <div key={edu.id} className="space-y-1">
+          <div key={edu.id} className="space-y-0.5">
             {isVintage ? (
               <>
                 <div className="flex items-baseline justify-between gap-4">
