@@ -72,7 +72,55 @@ export default function Home() {
     (pageCount * RESUME_PAGE_HEIGHT + Math.max(0, pageCount - 1) * RESUME_PAGE_GAP) * zoomScale;
 
   return (
-    <div className="flex flex-col min-h-screen bg-zinc-50 dark:bg-zinc-950">
+    <>
+      <style>{`
+        @page {
+          size: A4;
+          margin: 0;
+        }
+
+        @media print {
+          html, body {
+            background: #ffffff !important;
+          }
+
+          body {
+            margin: 0 !important;
+          }
+
+          #app-shell {
+            display: none !important;
+          }
+
+          #print-resume-shell {
+            display: block !important;
+            background: #ffffff !important;
+          }
+
+          #print-resume-shell #resume-preview-stack {
+            gap: 0 !important;
+          }
+
+          #print-resume-shell [data-resume-page="true"] {
+            box-shadow: none !important;
+            border: none !important;
+            border-radius: 0 !important;
+            break-after: page;
+            page-break-after: always;
+          }
+
+          #print-resume-shell [data-resume-page="true"]:last-child {
+            break-after: auto;
+            page-break-after: auto;
+          }
+
+          #print-resume-shell [title='Drag to reorder section'] {
+            display: none !important;
+          }
+        }
+      `}</style>
+
+      <div id="app-shell" className="flex flex-col min-h-screen bg-zinc-50 dark:bg-zinc-950 print:hidden">
       {/* Navbar / Header */}
       <header className="sticky top-0 z-40 w-full border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -199,6 +247,16 @@ export default function Home() {
           </div>
         </section>
       </main>
-    </div>
+      </div>
+
+      <main
+        id="print-resume-shell"
+        className="hidden min-h-screen bg-white px-0 py-0 text-zinc-900"
+      >
+        <div className="mx-auto flex w-fit flex-col gap-0">
+          <ResumeSheet />
+        </div>
+      </main>
+    </>
   );
 }

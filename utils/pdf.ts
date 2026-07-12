@@ -1,15 +1,19 @@
 /**
- * Opens a dedicated print route that renders the real resume HTML.
- * The browser print dialog can then save a text-based PDF instead of a raster snapshot.
+ * Triggers the browser print dialog from the current window so the user can
+ * save a text-based PDF generated from real HTML instead of a raster snapshot
+ * which was the issue before the refactor.
  */
 export async function exportToPDF(_elementId: string, filename: string = "resume.pdf") {
-  const printUrl = new URL("/print", window.location.origin);
-  printUrl.searchParams.set("filename", filename);
-  printUrl.searchParams.set("ts", String(Date.now()));
+  const originalTitle = document.title;
+  const printTitle = filename.replace(/\.pdf$/i, "");
 
-  const printWindow = window.open(printUrl.toString(), "_blank", "noopener,noreferrer");
+  document.title = printTitle;
 
-  if (!printWindow) {
-    console.error("Unable to open the print window. Please allow pop-ups for this site.");
+  try {
+    window.print();
+  } finally {
+    requestAnimationFrame(() => {
+      document.title = originalTitle;
+    });
   }
 }
