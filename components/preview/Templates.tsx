@@ -277,9 +277,11 @@ export function TemplateHeader({ state, primaryColor }: SectionProps) {
 // TEMPLATE SECTION TITLE
 // -------------------------------------------------------------
 export function TemplateSectionTitle({ title, primaryColor, template }: { title: string; primaryColor: string; template: string }) {
+
+  // Modern Template Section Title
   if (template === "modern") {
     return (
-      <div className="mb-3">
+      <div className="mb-0">
         <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-900 flex items-center gap-2">
           <span className="w-1.5 h-3.5 rounded" style={{ backgroundColor: primaryColor }} />
           {title}
@@ -288,19 +290,21 @@ export function TemplateSectionTitle({ title, primaryColor, template }: { title:
     );
   }
 
+  // Minimalist Template Section Title
   if (template === "minimalist") {
     return (
-      <div className="mb-3 mt-4 border-b border-zinc-200 pb-1">
+      <div className="mb-0 mt-0 border-b border-zinc-200 pb-1">
         <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-700">
           {title}
         </h3>
       </div>
     );
   }
-
+  
+  // Creative Template Section Title
   if (template === "creative") {
     return (
-      <div className="mb-3.5 mt-5">
+      <div className="mb-0 mt-0">
         <h3 className="text-sm font-extrabold text-zinc-900 pb-1 border-b-2" style={{ borderColor: `${primaryColor}40` }}>
           <span className="px-2 py-0.5 rounded text-[11px] text-white font-bold mr-2 align-middle" style={{ backgroundColor: primaryColor }}>
             {"//"}
@@ -311,9 +315,10 @@ export function TemplateSectionTitle({ title, primaryColor, template }: { title:
     );
   }
 
+  // Vintage Minimalist Template Section Title
   if (template === "vintageMinimalist") {
     return (
-      <div className="mb-3 mt-3" style={getVintageFontStyle()}>
+      <div className="mb-3 mt-4" style={getVintageFontStyle()}>
         <div className="flex items-center gap-3">
           <h3
             className="shrink-0 text-[16px] font-bold text-zinc-900"
@@ -333,7 +338,7 @@ export function TemplateSectionTitle({ title, primaryColor, template }: { title:
 
   // Professional Template Title
   return (
-    <div className="mb-3 mt-4 border-b border-zinc-300 pb-1">
+    <div className="mb-0 mt-0 border-b border-zinc-300 pb-1">
       <h3 className="text-sm font-bold uppercase tracking-wide" style={{ color: primaryColor }}>
         {title}
       </h3>
@@ -561,7 +566,7 @@ export function RenderSkills({ state, primaryColor }: SectionProps) {
       style={isVintage ? getVintageSectionStyle(state) : getSectionTextStyle(state)}
     >
       <TemplateSectionTitle title="Technical Skills" primaryColor={primaryColor} template={theme.template} />
-      <div className={isVintage ? "-mt-3 pl-4 space-y-[-0.5px]" : "space-y-2"}>
+      <div className={isVintage ? "-mt-3 pl-4 space-y-[-0.5px]" : "mt-1 space-y-1"}>
         {activeSkills.map((category) => {
           const tags = category.skills.split(",").map(t => t.trim()).filter(Boolean);
           return (
@@ -605,7 +610,7 @@ export function RenderLanguages({ state, primaryColor }: SectionProps) {
       style={isVintage ? getVintageSectionStyle(state) : getSectionTextStyle(state)}
     >
       <TemplateSectionTitle title="Languages" primaryColor={primaryColor} template={theme.template} />
-      <div className={isVintage ? " -mt-2 pl-4 flex flex-wrap gap-x-10 gap-y-3 text-xs" : "flex flex-wrap gap-x-6 gap-y-2 text-xs"}>
+      <div className={isVintage ? " -mt-2 pl-4 flex flex-wrap gap-x-10 gap-y-3 text-xs" : " mt-1 flex flex-wrap gap-x-6 gap-y-2 text-xs"}>
         {activeLangs.map((lang) => (
           <div key={lang.id} className="flex items-center gap-2">
             <span className={isVintage ? "font-semibold text-zinc-900" : "font-bold text-zinc-850"}>{lang.name}</span>
@@ -633,7 +638,7 @@ export function RenderCertifications({ state, primaryColor }: SectionProps) {
       style={isVintage ? getVintageSectionStyle(state) : getSectionTextStyle(state)}
     >
       <TemplateSectionTitle title="Certifications & Awards" primaryColor={primaryColor} template={theme.template} />
-      <div className={isVintage ? "-mt-2 pl-4 space-y-1" : "space-y-2"}>
+      <div className={isVintage ? "-mt-2 pl-4 space-y-1" : "mt-1 space-y-2"}>
         {activeCerts.map((cert) => (
           <div key={cert.id} className="flex justify-between items-baseline text-xs">
             <div>
