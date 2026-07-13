@@ -19,6 +19,7 @@ import {
   ZoomIn,
   ZoomOut,
   FileCheck,
+  FileText,
 } from "lucide-react";
 
 export default function Home() {
@@ -55,6 +56,38 @@ export default function Home() {
     await exportToPDF("resume-preview-stack", `${sanitizedName || "Resume"}.pdf`);
     setIsExporting(false);
   };
+
+  const handleLoadPDF = () => {
+    if (confirm("Are you sure you want to load a PDF? This will overwrite your current progress.")) {
+      const fileInput = document.createElement("input");
+      fileInput.type = "file";
+      fileInput.accept = ".pdf";
+      fileInput.onchange = async (event: Event) => {
+        const target = event.target as HTMLInputElement;
+        if (target.files && target.files.length > 0) {
+          const file = target.files[0];
+          const reader = new FileReader();
+          reader.onload = async (e) => {
+            const arrayBuffer = e.target?.result;
+            if (arrayBuffer instanceof ArrayBuffer) {
+              try {
+                const pdfData = new Uint8Array(arrayBuffer);
+                // Here you would implement the logic to parse the PDF and extract data
+                // For now, we will just log the size of the PDF
+                console.log("PDF loaded, size:", pdfData.length);
+                alert("PDF loaded successfully! (Parsing not implemented)");
+              } catch (error) {
+                console.error("Error loading PDF:", error);
+                alert("Failed to load PDF. Please ensure it's a valid PDF file.");
+              }
+            }
+          };
+          reader.readAsArrayBuffer(file);
+        }
+      };
+      fileInput.click();
+    }
+  }
 
   const handleReset = () => {
     if (confirm("Are you sure you want to load the sample data? This will overwrite your current progress.")) {
@@ -140,15 +173,23 @@ export default function Home() {
             {/* Dark Mode Toggle */}
             <button
               onClick={() => setTheme(currentTheme === "dark" ? "light" : "dark")}
-              className="p-2 border border-zinc-200 dark:border-zinc-800 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-900 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer transition-colors"
+              className="p-2 border border-zinc-200 dark:border-zinc-800 rounded-lg hover:bg-zinc-950 dark:hover:bg-zinc-50 text-zinc-600 dark:text-zinc-400 hover:text-zinc-50 dark:hover:text-zinc-950 cursor-pointer transition-colors"
               title="Toggle Dark Mode"
             >
               {currentTheme === "dark" ? <Sun className="h-4.5 w-4.5" /> : <Moon className="h-4.5 w-4.5" />}
             </button>
 
             <button
+              onClick={handleLoadPDF}
+              className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-50 dark:hover:text-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-950 dark:hover:bg-zinc-50 rounded-lg cursor-pointer transition-colors"
+            >
+              <FileText className="h-3.5 w-3.5" />
+              Load PDF
+            </button>
+
+            <button
               onClick={handleReset}
-              className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-900 rounded-lg cursor-pointer transition-colors"
+              className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-50 dark:hover:text-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-950 dark:hover:bg-zinc-50 rounded-lg cursor-pointer transition-colors"
             >
               <RefreshCw className="h-3.5 w-3.5" />
               Load Sample
@@ -156,7 +197,7 @@ export default function Home() {
 
             <button
               onClick={handleClear}
-              className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-zinc-600 hover:text-red-600 dark:text-zinc-400 dark:hover:text-red-400 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-900 rounded-lg cursor-pointer transition-colors"
+              className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-red-600 dark:hover:text-red-600 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-950 dark:hover:bg-zinc-50 rounded-lg cursor-pointer transition-colors"
             >
               <Trash2 className="h-3.5 w-3.5" />
               Clear All
@@ -187,24 +228,24 @@ export default function Home() {
           <div className="bg-white dark:bg-zinc-950 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-4">
             {/* Scale/Zoom Selector */}
             <div className="flex items-center justify-between border-t border-zinc-100 dark:border-zinc-900 pt-3">
-              <span className="text-xs font-semibold text-zinc-500">Preview Scale: {Math.round(zoomScale * 100)}%</span>
+              <span className="text-xs font-semibold text-zinc-600 dark:text-zinc-400">Preview Scale: {Math.round(zoomScale * 100)}%</span>
               <div className="flex items-center gap-1.5">
                 <button
                   onClick={() => setZoomScale(Math.max(0.5, zoomScale - 0.05))}
-                  className="p-1 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-900 rounded text-zinc-500 cursor-pointer"
+                  className="p-1 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-950 dark:hover:bg-zinc-50 rounded text-zinc-600 dark:text-zinc-400 hover:text-zinc-50 dark:hover:text-zinc-950 cursor-pointer"
                   title="Zoom Out"
                 >
                   <ZoomOut className="h-3.5 w-3.5" />
                 </button>
                 <button
                   onClick={() => setZoomScale(0.60)}
-                  className="px-2 py-0.5 text-[10px] border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-900 rounded font-semibold text-zinc-600 dark:text-zinc-400 cursor-pointer"
+                  className="px-2 py-0.5 text-[10px] border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-950 dark:hover:bg-zinc-50 rounded font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-50 dark:hover:text-zinc-950 cursor-pointer"
                 >
                   Reset Fit
                 </button>
                 <button
                   onClick={() => setZoomScale(Math.min(1.2, zoomScale + 0.05))}
-                  className="p-1 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-900 rounded text-zinc-500 cursor-pointer"
+                  className="p-1 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-950 dark:hover:bg-zinc-50 rounded text-zinc-600 dark:text-zinc-400 hover:text-zinc-50 dark:hover:text-zinc-950 cursor-pointer"
                   title="Zoom In"
                 >
                   <ZoomIn className="h-3.5 w-3.5" />
@@ -216,8 +257,11 @@ export default function Home() {
           {/* Live Preview Container */}
           <div className="w-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden shadow-sm flex flex-col relative">
             <div className="bg-zinc-50 dark:bg-zinc-900/50 border-b border-zinc-200 dark:border-zinc-800 px-4 py-2 flex items-center justify-between">
-              <span className="text-xs font-bold text-zinc-500 tracking-wide uppercase">Live PDF Document Sheet</span>
-              <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-xs font-bold text-zinc-600 dark:text-zinc-400 tracking-wide uppercase">Live PDF Document Sheet</span>
+                <div className="relative h-2 w-2">
+                <span className="absolute inset-0 rounded-full bg-emerald-500 animate-ping opacity-70"></span>
+                <span className="absolute inset-0 rounded-full bg-emerald-500"></span>
+              </div>
             </div>
 
             {/* Scaled Preview Wrapper */}
