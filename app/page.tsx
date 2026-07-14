@@ -10,6 +10,7 @@ import ResumeSheet, {
   RESUME_PAGE_WIDTH,
 } from "../components/preview/ResumeSheet";
 import { exportToPDF } from "../utils/pdf";
+import { importResumeFromPdf } from "../utils/pdf-import";
 import {
   Download,
   Trash2,
@@ -72,13 +73,16 @@ export default function Home() {
             if (arrayBuffer instanceof ArrayBuffer) {
               try {
                 const pdfData = new Uint8Array(arrayBuffer);
-                // Here you would implement the logic to parse the PDF and extract data
-                // For now, we will just log the size of the PDF
-                console.log("PDF loaded, size:", pdfData.length);
-                alert("PDF loaded successfully! (Parsing not implemented)");
+                const importedState = await importResumeFromPdf(pdfData, state, file.name);
+                dispatch({ type: "LOAD_STATE", payload: importedState });
+                alert("PDF loaded successfully. Review the imported content and adjust any fields that need cleanup.");
               } catch (error) {
                 console.error("Error loading PDF:", error);
-                alert("Failed to load PDF. Please ensure it's a valid PDF file.");
+                alert(
+                  error instanceof Error
+                    ? `Failed to load PDF: ${error.message}`
+                    : "Failed to load PDF. Please ensure it's a text-based PDF file."
+                );
               }
             }
           };
@@ -87,7 +91,7 @@ export default function Home() {
       };
       fileInput.click();
     }
-  }
+  };
 
   const handleReset = () => {
     if (confirm("Are you sure you want to load the sample data? This will overwrite your current progress.")) {
