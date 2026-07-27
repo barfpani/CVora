@@ -11,7 +11,6 @@ export interface PersonalInfo {
   github: string;
   linkedin: string;
   location: string;
-  photo: string;
 }
 
 export interface WorkExperience {
@@ -122,7 +121,6 @@ const INITIAL_STATE: ResumeState = {
     github: "github.com/johndoe",
     linkedin: "linkedin.com/in/johndoe",
     location: "San Francisco, CA",
-    photo: "",
   },
   summary: `
     <p>Dynamic and results-driven Senior Frontend Engineer with 5+ years of experience designing, building, and deploying highly responsive, user-centric web applications. Expert in React, Next.js, and modern CSS frameworks, with a strong focus on web performance, accessibility, and clean architecture.</p>
@@ -534,7 +532,6 @@ function resumeReducer(state: ResumeState, action: ResumeAction): ResumeState {
           github: "",
           linkedin: "",
           location: "",
-          photo: "",
         },
         summary: "",
         workExperience: [],

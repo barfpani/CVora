@@ -102,13 +102,6 @@ export function TemplateHeader({ state, primaryColor }: SectionProps) {
     return (
       <div className={`${personalFontClass} flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-zinc-200`}>
         <div className="flex items-center gap-4">
-          {personalInfo.photo && (
-            <img
-              src={personalInfo.photo}
-              alt={personalInfo.name}
-              className="w-20 h-20 rounded-xl object-cover border border-zinc-200"
-            />
-          )}
           <div>
             <h1 className="text-3xl font-extrabold tracking-tight text-zinc-900" style={{ color: primaryColor }}>
               {personalInfo.name || "Your Name"}

@@ -396,18 +396,6 @@ function PersonalInfoForm() {
             className="w-full px-3.5 py-2 text-sm rounded-lg border border-zinc-200 dark:border-zinc-800 bg-transparent text-zinc-950 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
           />
         </div>
-
-        <div className="space-y-2 md:col-span-2">
-          <label className="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Profile Photo URL (Optional)</label>
-          <input
-            type="text"
-            name="photo"
-            value={personalInfo.photo}
-            onChange={handleChange}
-            placeholder="https://images.unsplash.com/... or base64"
-            className="w-full px-3.5 py-2 text-sm rounded-lg border border-zinc-200 dark:border-zinc-800 bg-transparent text-zinc-950 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
-          />
-        </div>
       </div>
     </div>
   );
