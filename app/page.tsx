@@ -10,7 +10,6 @@ import ResumeSheet, {
   RESUME_PAGE_WIDTH,
 } from "../components/preview/ResumeSheet";
 import { exportToPDF } from "../utils/pdf";
-import { importResumeFromPdf } from "../utils/pdf-import";
 import {
   Download,
   Trash2,
@@ -59,38 +58,7 @@ export default function Home() {
   };
 
   const handleLoadPDF = () => {
-    if (confirm("Are you sure you want to load a PDF? This will overwrite your current progress.")) {
-      const fileInput = document.createElement("input");
-      fileInput.type = "file";
-      fileInput.accept = ".pdf";
-      fileInput.onchange = async (event: Event) => {
-        const target = event.target as HTMLInputElement;
-        if (target.files && target.files.length > 0) {
-          const file = target.files[0];
-          const reader = new FileReader();
-          reader.onload = async (e) => {
-            const arrayBuffer = e.target?.result;
-            if (arrayBuffer instanceof ArrayBuffer) {
-              try {
-                const pdfData = new Uint8Array(arrayBuffer);
-                const importedState = await importResumeFromPdf(pdfData, state, file.name);
-                dispatch({ type: "LOAD_STATE", payload: importedState });
-                alert("PDF loaded successfully. Review the imported content and adjust any fields that need cleanup.");
-              } catch (error) {
-                console.error("Error loading PDF:", error);
-                alert(
-                  error instanceof Error
-                    ? `Failed to load PDF: ${error.message}`
-                    : "Failed to load PDF. Please ensure it's a text-based PDF file."
-                );
-              }
-            }
-          };
-          reader.readAsArrayBuffer(file);
-        }
-      };
-      fileInput.click();
-    }
+    alert("PDF import is being rebuilt around the new schema-driven extraction flow and is temporarily unavailable.");
   };
 
   const handleReset = () => {
