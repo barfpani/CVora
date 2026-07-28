@@ -73,7 +73,7 @@ export default function RootLayout({
       className={`${inter.variable} ${merriweather.variable} ${robotoMono.variable} ${outfit.variable} ${playfairDisplay.variable} ${computerModern.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-50 transition-colors duration-150">
+      <body className="min-h-full flex flex-col bg-orange-100 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-50 transition-colors duration-150">
         <Providers>{children}</Providers>
       </body>
     </html>
