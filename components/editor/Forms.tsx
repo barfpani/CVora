@@ -69,9 +69,9 @@ export default function EditorPanel() {
   ];
 
   return (
-    <div className="flex flex-col lg:flex-row h-full bg-white dark:bg-zinc-950 rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden shadow-md">
+    <div className="flex flex-col lg:flex-row h-full bg-orange-50 dark:bg-zinc-950 rounded-xl border border-orange-100 dark:border-zinc-800 overflow-hidden shadow-md">
       {/* Tab Navigation */}
-      <div className="flex lg:flex-col overflow-x-auto lg:overflow-x-visible border-b lg:border-b-0 lg:border-r border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 p-2 lg:w-64 shrink-0 gap-1 scrollbar-none">
+      <div className="flex lg:flex-col overflow-x-auto lg:overflow-x-visible border-b lg:border-b-0 lg:border-r border-orange-100 dark:border-zinc-800 bg-orange-50 dark:bg-zinc-900/50 p-2 lg:w-64 shrink-0 gap-1 scrollbar-none">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -81,8 +81,8 @@ export default function EditorPanel() {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200 shrink-0 lg:shrink lg:w-full ${
                 isActive
-                  ? "bg-blue-600 text-white shadow-sm shadow-blue-500/10"
-                  : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100"
+                  ? "bg-orange-200 text-zinc-600 shadow-sm shadow-orange-500/10"
+                  : "text-zinc-600 dark:text-zinc-400 hover:bg-orange-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100"
               }`}
             >
               <Icon className="h-4.5 w-4.5" />
@@ -309,7 +309,7 @@ function PersonalInfoForm() {
             value={personalInfo.name}
             onChange={handleChange}
             placeholder="John Doe"
-            className="w-full px-3.5 py-2 text-sm rounded-lg border border-zinc-200 dark:border-zinc-800 bg-transparent text-zinc-950 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+            className="w-full px-3.5 py-2 text-sm rounded-lg border border-zinc-200 dark:border-zinc-800 bg-transparent text-zinc-950 dark:text-zinc-50 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200 transition-colors"
           />
         </div>
 
@@ -321,7 +321,7 @@ function PersonalInfoForm() {
             value={personalInfo.title}
             onChange={handleChange}
             placeholder="Senior Frontend Developer"
-            className="w-full px-3.5 py-2 text-sm rounded-lg border border-zinc-200 dark:border-zinc-800 bg-transparent text-zinc-950 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+            className="w-full px-3.5 py-2 text-sm rounded-lg border border-zinc-200 dark:border-zinc-800 bg-transparent text-zinc-950 dark:text-zinc-50 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200 transition-colors"
           />
         </div>
 
@@ -333,7 +333,7 @@ function PersonalInfoForm() {
             value={personalInfo.email}
             onChange={handleChange}
             placeholder="john.doe@example.com"
-            className="w-full px-3.5 py-2 text-sm rounded-lg border border-zinc-200 dark:border-zinc-800 bg-transparent text-zinc-950 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+            className="w-full px-3.5 py-2 text-sm rounded-lg border border-zinc-200 dark:border-zinc-800 bg-transparent text-zinc-950 dark:text-zinc-50 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200 transition-colors"
           />
         </div>
 
@@ -345,7 +345,7 @@ function PersonalInfoForm() {
             value={personalInfo.phone}
             onChange={handleChange}
             placeholder="+1 (555) 123-4567"
-            className="w-full px-3.5 py-2 text-sm rounded-lg border border-zinc-200 dark:border-zinc-800 bg-transparent text-zinc-950 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+            className="w-full px-3.5 py-2 text-sm rounded-lg border border-zinc-200 dark:border-zinc-800 bg-transparent text-zinc-950 dark:text-zinc-50 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200 transition-colors"
           />
         </div>
 
@@ -357,7 +357,7 @@ function PersonalInfoForm() {
             value={personalInfo.location}
             onChange={handleChange}
             placeholder="San Francisco, CA"
-            className="w-full px-3.5 py-2 text-sm rounded-lg border border-zinc-200 dark:border-zinc-800 bg-transparent text-zinc-950 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+            className="w-full px-3.5 py-2 text-sm rounded-lg border border-zinc-200 dark:border-zinc-800 bg-transparent text-zinc-950 dark:text-zinc-50 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200 transition-colors"
           />
         </div>
 
@@ -369,7 +369,7 @@ function PersonalInfoForm() {
             value={personalInfo.website}
             onChange={handleChange}
             placeholder="johndoe.dev"
-            className="w-full px-3.5 py-2 text-sm rounded-lg border border-zinc-200 dark:border-zinc-800 bg-transparent text-zinc-950 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+            className="w-full px-3.5 py-2 text-sm rounded-lg border border-zinc-200 dark:border-zinc-800 bg-transparent text-zinc-950 dark:text-zinc-50 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200 transition-colors"
           />
         </div>
 
@@ -381,7 +381,7 @@ function PersonalInfoForm() {
             value={personalInfo.github}
             onChange={handleChange}
             placeholder="github.com/johndoe"
-            className="w-full px-3.5 py-2 text-sm rounded-lg border border-zinc-200 dark:border-zinc-800 bg-transparent text-zinc-950 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+            className="w-full px-3.5 py-2 text-sm rounded-lg border border-zinc-200 dark:border-zinc-800 bg-transparent text-zinc-950 dark:text-zinc-50 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200 transition-colors"
           />
         </div>
 
@@ -393,7 +393,7 @@ function PersonalInfoForm() {
             value={personalInfo.linkedin}
             onChange={handleChange}
             placeholder="linkedin.com/in/johndoe"
-            className="w-full px-3.5 py-2 text-sm rounded-lg border border-zinc-200 dark:border-zinc-800 bg-transparent text-zinc-950 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+            className="w-full px-3.5 py-2 text-sm rounded-lg border border-zinc-200 dark:border-zinc-800 bg-transparent text-zinc-950 dark:text-zinc-50 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200 transition-colors"
           />
         </div>
       </div>
@@ -450,7 +450,7 @@ function ExperienceForm() {
               if (lastItem) setExpandedId(lastItem.id);
             }, 50);
           }}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg shadow-sm cursor-pointer transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-zinc-600 dark:text-zinc-600 bg-orange-200 hover:bg-orange-300 active:bg-orange-400 rounded-lg shadow-sm cursor-pointer transition-colors"
         >
           <Plus className="h-3.5 w-3.5" />
           Add Job
@@ -511,7 +511,7 @@ function ExperienceForm() {
                           value={exp.position}
                           onChange={(e) => updateItem(exp.id, { position: e.target.value })}
                           placeholder="e.g. Senior Frontend Architect"
-                          className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
                         />
                       </div>
                       <div className="space-y-1">
@@ -521,7 +521,7 @@ function ExperienceForm() {
                           value={exp.company}
                           onChange={(e) => updateItem(exp.id, { company: e.target.value })}
                           placeholder="e.g. Google Inc."
-                          className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
                         />
                       </div>
                       <div className="space-y-1">
@@ -531,7 +531,7 @@ function ExperienceForm() {
                           value={exp.location}
                           onChange={(e) => updateItem(exp.id, { location: e.target.value })}
                           placeholder="e.g. San Francisco, CA"
-                          className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
                         />
                       </div>
                       <div className="grid grid-cols-2 gap-2">
@@ -542,7 +542,7 @@ function ExperienceForm() {
                             value={exp.startDate}
                             onChange={(e) => updateItem(exp.id, { startDate: e.target.value })}
                             placeholder="e.g. Jun 2021"
-                            className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
                           />
                         </div>
                         <div className="space-y-1">
@@ -553,7 +553,7 @@ function ExperienceForm() {
                             disabled={exp.current}
                             onChange={(e) => updateItem(exp.id, { endDate: e.target.value })}
                             placeholder={exp.current ? "Present" : "e.g. Dec 2023"}
-                            className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:bg-zinc-50 dark:disabled:bg-zinc-900"
+                            className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200 disabled:opacity-50 disabled:bg-zinc-50 dark:disabled:bg-zinc-900"
                           />
                         </div>
                       </div>
@@ -565,7 +565,7 @@ function ExperienceForm() {
                         id={`current-job-${exp.id}`}
                         checked={exp.current}
                         onChange={(e) => updateItem(exp.id, { current: e.target.checked })}
-                        className="rounded border-zinc-300 dark:border-zinc-700 text-blue-600 focus:ring-blue-500"
+                        className="rounded border-zinc-500 dark:border-zinc-700 text-orange-600 focus:ring-blue-500"
                       />
                       <label htmlFor={`current-job-${exp.id}`} className="text-xs text-zinc-600 dark:text-zinc-400 font-medium">
                         I am currently working in this role
@@ -619,7 +619,7 @@ function EducationForm() {
               if (lastItem) setExpandedId(lastItem.id);
             }, 50);
           }}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg shadow-sm cursor-pointer transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-zinc-600 dark:text-zinc-600 bg-orange-200 hover:bg-orange-300 active:bg-orange-400 rounded-lg shadow-sm cursor-pointer transition-colors"
         >
           <Plus className="h-3.5 w-3.5" />
           Add School
@@ -628,7 +628,7 @@ function EducationForm() {
 
       <div className="space-y-3">
         {state.education.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-8 px-4 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-400 dark:text-zinc-500 text-sm">
+          <div className="flex flex-col items-center justify-center py-8 px-4 border border-dashed border-orange-100 dark:border-zinc-800 rounded-lg text-zinc-400 dark:text-zinc-500 text-sm">
             No education history added yet. Click "Add School" to begin.
           </div>
         ) : (
@@ -680,7 +680,7 @@ function EducationForm() {
                           value={edu.school}
                           onChange={(e) => updateItem(edu.id, { school: e.target.value })}
                           placeholder="e.g. UC Berkeley"
-                          className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
                         />
                       </div>
                       <div className="space-y-1">
@@ -690,7 +690,7 @@ function EducationForm() {
                           value={edu.degree}
                           onChange={(e) => updateItem(edu.id, { degree: e.target.value })}
                           placeholder="e.g. B.S. or M.S."
-                          className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
                         />
                       </div>
                       <div className="space-y-1">
@@ -700,7 +700,7 @@ function EducationForm() {
                           value={edu.fieldOfStudy}
                           onChange={(e) => updateItem(edu.id, { fieldOfStudy: e.target.value })}
                           placeholder="e.g. Computer Science"
-                          className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
                         />
                       </div>
                       <div className="space-y-1">
@@ -710,7 +710,7 @@ function EducationForm() {
                           value={edu.location}
                           onChange={(e) => updateItem(edu.id, { location: e.target.value })}
                           placeholder="e.g. Berkeley, CA"
-                          className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
                         />
                       </div>
                       <div className="grid grid-cols-2 gap-2">
@@ -721,7 +721,7 @@ function EducationForm() {
                             value={edu.startDate}
                             onChange={(e) => updateItem(edu.id, { startDate: e.target.value })}
                             placeholder="e.g. Sep 2017"
-                            className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
                           />
                         </div>
                         <div className="space-y-1">
@@ -732,7 +732,7 @@ function EducationForm() {
                             disabled={edu.current}
                             onChange={(e) => updateItem(edu.id, { endDate: e.target.value })}
                             placeholder={edu.current ? "Ongoing" : "e.g. May 2021"}
-                            className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:bg-zinc-50 dark:disabled:bg-zinc-900"
+                            className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200 disabled:opacity-50 disabled:bg-zinc-50 dark:disabled:bg-zinc-900"
                           />
                         </div>
                       </div>
@@ -758,7 +758,7 @@ function EducationForm() {
                         onChange={(e) => updateItem(edu.id, { description: e.target.value })}
                         placeholder="e.g. GPA 3.9, Courses in AI, President of Hackers club..."
                         rows={3}
-                        className="w-full px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
                       />
                     </div>
                   </div>
@@ -801,7 +801,7 @@ function ProjectsForm() {
               if (lastItem) setExpandedId(lastItem.id);
             }, 50);
           }}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg shadow-sm cursor-pointer transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-zinc-600 dark:text-zinc-600 bg-orange-200 hover:bg-orange-300 active:bg-orange-400 rounded-lg shadow-sm cursor-pointer transition-colors"
         >
           <Plus className="h-3.5 w-3.5" />
           Add Project
@@ -810,7 +810,7 @@ function ProjectsForm() {
 
       <div className="space-y-3">
         {state.projects.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-8 px-4 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-400 dark:text-zinc-500 text-sm">
+          <div className="flex flex-col items-center justify-center py-8 px-4 border border-dashed border-orange-100 dark:border-zinc-800 rounded-lg text-zinc-400 dark:text-zinc-500 text-sm">
             No projects added yet. Click "Add Project" to begin.
           </div>
         ) : (
@@ -862,7 +862,7 @@ function ProjectsForm() {
                           value={proj.name}
                           onChange={(e) => updateItem(proj.id, { name: e.target.value })}
                           placeholder="e.g. Resume Craft"
-                          className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
                         />
                       </div>
                       <div className="space-y-1">
@@ -872,7 +872,7 @@ function ProjectsForm() {
                           value={proj.role}
                           onChange={(e) => updateItem(proj.id, { role: e.target.value })}
                           placeholder="e.g. Lead Developer / Creator"
-                          className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
                         />
                       </div>
                       <div className="space-y-1">
@@ -882,7 +882,7 @@ function ProjectsForm() {
                           value={proj.url}
                           onChange={(e) => updateItem(proj.id, { url: e.target.value })}
                           placeholder="e.g. https://resumecraft.dev"
-                          className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
                         />
                       </div>
                       <div className="space-y-1">
@@ -892,7 +892,7 @@ function ProjectsForm() {
                           value={proj.technologies}
                           onChange={(e) => updateItem(proj.id, { technologies: e.target.value })}
                           placeholder="e.g. Next.js, React, Tailwind CSS"
-                          className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
                         />
                       </div>
                     </div>
@@ -931,7 +931,7 @@ function SkillsForm() {
         </div>
         <button
           onClick={() => dispatch({ type: "ADD_SKILL" })}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg shadow-sm cursor-pointer transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-zinc-600 dark:text-zinc-600 bg-orange-200 hover:bg-orange-300 active:bg-orange-400 rounded-lg shadow-sm cursor-pointer transition-colors"
         >
           <Plus className="h-3.5 w-3.5" />
           Add Category
@@ -940,7 +940,7 @@ function SkillsForm() {
 
       <div className="space-y-4">
         {state.skills.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-8 px-4 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-400 dark:text-zinc-500 text-sm">
+          <div className="flex flex-col items-center justify-center py-8 px-4 border border-dashed border-orange-100 dark:border-zinc-800 rounded-lg text-zinc-400 dark:text-zinc-500 text-sm">
             No skills added yet. Click "Add Category" to begin.
           </div>
         ) : (
@@ -956,7 +956,7 @@ function SkillsForm() {
                   value={skill.name}
                   onChange={(e) => updateItem(skill.id, { name: e.target.value })}
                   placeholder="e.g. Libraries & APIs"
-                  className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 font-medium"
+                  className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200 font-medium"
                 />
               </div>
               <div className="w-full md:w-2/3 space-y-1 flex items-end gap-2">
@@ -967,7 +967,7 @@ function SkillsForm() {
                     value={skill.skills}
                     onChange={(e) => updateItem(skill.id, { skills: e.target.value })}
                     placeholder="e.g. React, Next.js, Redux, Tailwind"
-                    className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
                   />
                 </div>
                 <button
@@ -1002,7 +1002,7 @@ function LanguagesForm() {
         </div>
         <button
           onClick={() => dispatch({ type: "ADD_LANGUAGE" })}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg shadow-sm cursor-pointer transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-zinc-600 dark:text-zinc-600 bg-orange-200 hover:bg-orange-300 active:bg-orange-400 rounded-lg shadow-sm cursor-pointer transition-colors"
         >
           <Plus className="h-3.5 w-3.5" />
           Add Language
@@ -1011,7 +1011,7 @@ function LanguagesForm() {
 
       <div className="grid grid-cols-1 gap-3">
         {state.languages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-8 px-4 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-400 dark:text-zinc-500 text-sm">
+          <div className="flex flex-col items-center justify-center py-8 px-4 border border-dashed border-orange-100 dark:border-zinc-800 rounded-lg text-zinc-400 dark:text-zinc-500 text-sm">
             No languages added yet. Click "Add Language" to begin.
           </div>
         ) : (
@@ -1026,12 +1026,12 @@ function LanguagesForm() {
                   value={lang.name}
                   onChange={(e) => updateItem(lang.id, { name: e.target.value })}
                   placeholder="e.g. English"
-                  className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
                 />
                 <select
                   value={lang.proficiency}
                   onChange={(e) => updateItem(lang.id, { proficiency: e.target.value })}
-                  className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
                 >
                   <option value="">Select Proficiency</option>
                   <option value="Native">Native</option>
@@ -1071,7 +1071,7 @@ function CertificationsForm() {
         </div>
         <button
           onClick={() => dispatch({ type: "ADD_CERTIFICATION" })}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg shadow-sm cursor-pointer transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-zinc-600 dark:text-zinc-600 bg-orange-200 hover:bg-orange-300 active:bg-orange-400 rounded-lg shadow-sm cursor-pointer transition-colors"
         >
           <Plus className="h-3.5 w-3.5" />
           Add Entry
@@ -1080,7 +1080,7 @@ function CertificationsForm() {
 
       <div className="space-y-3">
         {state.certifications.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-8 px-4 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-400 dark:text-zinc-500 text-sm">
+          <div className="flex flex-col items-center justify-center py-8 px-4 border border-dashed border-orange-100 dark:border-zinc-800 rounded-lg text-zinc-400 dark:text-zinc-500 text-sm">
             No certifications added yet. Click "Add Entry" to begin.
           </div>
         ) : (
@@ -1095,21 +1095,21 @@ function CertificationsForm() {
                   value={cert.name}
                   onChange={(e) => updateItem(cert.id, { name: e.target.value })}
                   placeholder="e.g. AWS Certified Architect"
-                  className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
                 />
                 <input
                   type="text"
                   value={cert.issuer}
                   onChange={(e) => updateItem(cert.id, { issuer: e.target.value })}
                   placeholder="e.g. Amazon Web Services"
-                  className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
                 />
                 <input
                   type="text"
                   value={cert.date}
                   onChange={(e) => updateItem(cert.id, { date: e.target.value })}
                   placeholder="e.g. 2025"
-                  className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
                 />
               </div>
               <button
