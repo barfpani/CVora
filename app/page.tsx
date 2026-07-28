@@ -125,19 +125,19 @@ export default function Home() {
         }
       `}</style>
 
-      <div id="app-shell" className="flex flex-col min-h-screen bg-zinc-50 dark:bg-zinc-950 print:hidden">
+      <div id="app-shell" className="flex flex-col min-h-screen bg-orange-100 dark:bg-zinc-950 print:hidden">
       {/* Navbar / Header */}
-      <header className="sticky top-0 z-40 w-full border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md px-6 py-4">
+      <header className="sticky top-0 z-40 w-full border-b border-orange-100 dark:border-zinc-800 bg-orange-50 dark:bg-zinc-950/80 backdrop-blur-md px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
-              <FileCheck className="h-5 w-5 text-white" />
+            <div className="h-10 w-10 rounded-xl bg-orange-200 flex items-center justify-center dark:bg-orange-200">
+              <FileCheck className="h-5 w-5 text-zinc dark:text-zinc-900" />
             </div>
             <div>
               <h1 className="text-xl font-bold tracking-tight bg-gradient-to-r from-zinc-900 to-zinc-700 dark:from-zinc-100 dark:to-zinc-300 bg-clip-text text-transparent">
                 Resume Craft
               </h1>
-              <p className="text-[10px] text-zinc-500 font-medium">Free Resume Generator</p>
+              <p className="text-[10px] text-zinc-500 font-medium">Simple Resume Generator</p>
             </div>
           </div>
 
@@ -145,7 +145,7 @@ export default function Home() {
             {/* Dark Mode Toggle */}
             <button
               onClick={() => setTheme(currentTheme === "dark" ? "light" : "dark")}
-              className="p-2 border border-zinc-200 dark:border-zinc-800 rounded-lg hover:bg-zinc-950 dark:hover:bg-zinc-50 text-zinc-600 dark:text-zinc-400 hover:text-zinc-50 dark:hover:text-zinc-950 cursor-pointer transition-colors"
+              className="p-2 border border-zinc-400 dark:border-zinc-800 rounded-lg hover:bg-zinc-950 dark:hover:bg-orange-50 text-zinc-600 dark:text-zinc-400 hover:text-zinc-50 dark:hover:text-zinc-950 cursor-pointer transition-colors"
               title="Toggle Dark Mode"
             >
               {currentTheme === "dark" ? <Sun className="h-4.5 w-4.5" /> : <Moon className="h-4.5 w-4.5" />}
@@ -153,7 +153,7 @@ export default function Home() {
 
             <button
               onClick={handleLoadPDF}
-              className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-50 dark:hover:text-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-950 dark:hover:bg-zinc-50 rounded-lg cursor-pointer transition-colors"
+              className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-900 border border-zinc-400 dark:border-zinc-800 hover:bg-orange-100 dark:hover:bg-orange-100 rounded-lg cursor-pointer transition-colors"
             >
               <FileText className="h-3.5 w-3.5" />
               Load PDF
@@ -161,7 +161,7 @@ export default function Home() {
 
             <button
               onClick={handleReset}
-              className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-50 dark:hover:text-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-950 dark:hover:bg-zinc-50 rounded-lg cursor-pointer transition-colors"
+              className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-900 border border-zinc-400 dark:border-zinc-800 hover:bg-orange-100 dark:hover:bg-orange-100 rounded-lg cursor-pointer transition-colors"
             >
               <RefreshCw className="h-3.5 w-3.5" />
               Load Sample
@@ -169,7 +169,7 @@ export default function Home() {
 
             <button
               onClick={handleClear}
-              className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-red-600 dark:hover:text-red-600 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-950 dark:hover:bg-zinc-50 rounded-lg cursor-pointer transition-colors"
+              className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-red-600 dark:hover:text-red-600 border border-zinc-400 dark:border-zinc-800 hover:bg-orange-100 dark:hover:bg-orange-100 rounded-lg cursor-pointer transition-colors"
             >
               <Trash2 className="h-3.5 w-3.5" />
               Clear All
@@ -178,7 +178,7 @@ export default function Home() {
             <button
               onClick={handleDownloadPDF}
               disabled={isExporting}
-              className="flex items-center gap-2 px-4.5 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 rounded-lg shadow-md shadow-blue-500/10 transition-colors cursor-pointer"
+              className="flex items-center gap-2 px-4.5 py-2 text-xs font-bold text-zinc-600 dark:text-zinc-600 bg-orange-200 hover:bg-orange-300 active:bg-orange-400 disabled:opacity-50 rounded-lg shadow-md shadow-orange-500/10 transition-colors cursor-pointer"
             >
               <Download className="h-4 w-4" />
               {isExporting ? "Generating..." : "Download PDF"}
@@ -197,27 +197,27 @@ export default function Home() {
         {/* Right Side: Live Preview */}
         <section className="lg:col-span-6 xl:col-span-5 flex flex-col gap-4">
           {/* Preview Controls */}
-          <div className="bg-white dark:bg-zinc-950 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-4">
+          <div className="bg-orange-50 dark:bg-zinc-950 p-4 rounded-xl border border-orange-100 dark:border-zinc-800 shadow-sm space-y-4">
             {/* Scale/Zoom Selector */}
-            <div className="flex items-center justify-between border-t border-zinc-100 dark:border-zinc-900 pt-3">
+            <div className="flex items-center justify-between border-t border-zinc-400 dark:border-zinc-800 pt-3">
               <span className="text-xs font-semibold text-zinc-600 dark:text-zinc-400">Preview Scale: {Math.round(zoomScale * 100)}%</span>
               <div className="flex items-center gap-1.5">
                 <button
                   onClick={() => setZoomScale(Math.max(0.5, zoomScale - 0.05))}
-                  className="p-1 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-950 dark:hover:bg-zinc-50 rounded text-zinc-600 dark:text-zinc-400 hover:text-zinc-50 dark:hover:text-zinc-950 cursor-pointer"
+                  className="p-1 border border-zinc-400 dark:border-zinc-800 hover:bg-orange-100 dark:hover:bg-orange-100 rounded text-zinc-600 dark:text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-950 cursor-pointer"
                   title="Zoom Out"
                 >
                   <ZoomOut className="h-3.5 w-3.5" />
                 </button>
                 <button
                   onClick={() => setZoomScale(0.60)}
-                  className="px-2 py-0.5 text-[10px] border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-950 dark:hover:bg-zinc-50 rounded font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-50 dark:hover:text-zinc-950 cursor-pointer"
+                  className="px-2 py-0.5 text-[10px] border border-zinc-400 dark:border-zinc-800 hover:bg-orange-100 dark:hover:bg-orange-100 rounded font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-950 cursor-pointer"
                 >
                   Reset Fit
                 </button>
                 <button
                   onClick={() => setZoomScale(Math.min(1.2, zoomScale + 0.05))}
-                  className="p-1 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-950 dark:hover:bg-zinc-50 rounded text-zinc-600 dark:text-zinc-400 hover:text-zinc-50 dark:hover:text-zinc-950 cursor-pointer"
+                  className="p-1 border border-zinc-400 dark:border-zinc-800 hover:bg-orange-100 dark:hover:bg-orange-100 rounded text-zinc-600 dark:text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-950 cursor-pointer"
                   title="Zoom In"
                 >
                   <ZoomIn className="h-3.5 w-3.5" />
@@ -227,8 +227,8 @@ export default function Home() {
           </div>
 
           {/* Live Preview Container */}
-          <div className="w-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden shadow-sm flex flex-col relative">
-            <div className="bg-zinc-50 dark:bg-zinc-900/50 border-b border-zinc-200 dark:border-zinc-800 px-4 py-2 flex items-center justify-between">
+          <div className="w-full bg-orange-50 dark:bg-zinc-900 border border-orange-100 dark:border-zinc-800 rounded-xl overflow-hidden shadow-sm flex flex-col relative">
+            <div className="bg-orange-50 dark:bg-zinc-900/50 border-b border-orange-100 dark:border-zinc-800 px-4 py-2 flex items-center justify-between">
               <span className="text-xs font-bold text-zinc-600 dark:text-zinc-400 tracking-wide uppercase">Live PDF Document Sheet</span>
                 <div className="relative h-2 w-2">
                 <span className="absolute inset-0 rounded-full bg-emerald-500 animate-ping opacity-70"></span>
