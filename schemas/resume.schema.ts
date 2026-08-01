@@ -4,50 +4,45 @@ import { z } from "zod";
 const nullableString = z.string().trim().nullable();
 
 export const personalInfoSchema = z.object({
-    name: nullableString,
-    headline: nullableString,
-    email: nullableString,
+    name: z.string().trim().min(1, "Name is required"),
+    title: nullableString,
+    email: z.string().trim().email("Invalid email address"),
     phone: nullableString,
-    location: nullableString,
     website: nullableString,
-    linkedin: nullableString,
     github: nullableString,
+    linkedin: nullableString,
+    location: nullableString,
 });
 
 export const summarySchema = nullableString;
 
 export const experienceItemSchema = z.object({
-    company: nullableString,
-    role: nullableString,
+    company: z.string().trim().min(1, "Company is required"),
+    position: z.string().trim().min(1, "Position is required"),
     location: nullableString,
-    startDate: nullableString,
+    startDate: z.string().trim().min(1, "Start date is required"),
     endDate: nullableString,
-    isCurrent: z.boolean().nullable(),
-    dateText: nullableString,
+    isCurrent: z.boolean(),
     description: nullableString,
-    responsibilities: z.array(z.string().trim()).default([]),
 });
 
 export const educationItemSchema = z.object({
-    institution: nullableString,
-    degree: nullableString,
+    institution: z.string().trim().min(1, "Institution is required"),
+    degree: z.string().trim().min(1, "Degree is required"),
     fieldOfStudy: nullableString,
     location: nullableString,
-    startDate: nullableString,
+    startDate: z.string().trim().min(1, "Start date is required"),
     endDate: nullableString,
-    isCurrent: z.boolean().nullable(),
-    cgpa: nullableString,
-    percentage: nullableString,
+    isCurrent: z.boolean(),
     description: nullableString,
 });
 
 export const projectItemSchema = z.object({
-    name: nullableString,
+    name: z.string().trim().min(1, "Project name is required"),
     role: nullableString,
+    url: nullableString,
     description: nullableString,
     technologies: z.array(z.string().trim()).default([]),
-    github: nullableString,
-    liveDemo: nullableString,
 });
 
 export const skillGroupSchema = z.object({
@@ -56,20 +51,18 @@ export const skillGroupSchema = z.object({
 });
 
 export const languageItemsSchema = z.object({
-    name: nullableString,
+    name: z.string().trim().min(1, "Language name is required"),
     proficiency: nullableString,
 });
 
 export const certificationItemsSchema = z.object({
-    name: nullableString,
-    issuer: nullableString,
+    name: z.string().trim().min(1, "Certification name is required"),
+    issuer: z.string().trim().min(1, "Issuer is required"),
     date: nullableString,
-    credentialId: nullableString,
-    credentialUrl: nullableString,
 });
 
 export const resumeSchema = z.object({
-    personalInfo: personalInfoSchema.nullable(),
+    personalInfo: personalInfoSchema,
     summary: summarySchema,
     experience: z.array(experienceItemSchema).default([]),
     education: z.array(educationItemSchema).default([]),

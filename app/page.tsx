@@ -135,7 +135,7 @@ export default function Home() {
             </div>
             <div>
               <h1 className="text-xl font-bold tracking-tight bg-gradient-to-r from-zinc-900 to-zinc-700 dark:from-zinc-100 dark:to-zinc-300 bg-clip-text text-transparent">
-                Resume Craft
+                CVora
               </h1>
               <p className="text-[10px] text-zinc-500 font-medium">Create. Impress. Get Hired.</p>
             </div>
