@@ -18,6 +18,11 @@ GENERAL RULES
 - Preserve the original wording whenever possible.
 - Preserve the order of sections.
 - Preserve bullet points where applicable.
+- Use the exact field names defined by the schema.
+- If a section is missing, return an empty array for that section.
+- If a string field is missing, return null.
+- Do not return HTML.
+- Do not return app-state fields such as theme, visibleSections, sectionsOrder, ids, or formatting metadata.
 
 ========================
 MISSING DATA
@@ -27,7 +32,6 @@ If a value is missing:
 
 - Strings → null
 - Arrays → []
-- Objects → null (unless otherwise specified)
 
 Never generate placeholder values.
 
@@ -54,18 +58,33 @@ Dates:
 Preserve original format whenever possible.
 
 ========================
-SKILLS
+PERSONAL INFO
 ========================
 
-Extract technical skills exactly as written.
+Extract:
 
-Do not categorize them.
+- name
+- title
+- email
+- phone
+- website
+- github
+- linkedin
+- location
 
-Do not merge similar technologies.
+Use only information explicitly present in the resume.
 
-Example:
+Return a "personalInfo" object.
 
-["React", "Node.js", "C++", "SQL"]
+========================
+SUMMARY
+========================
+
+Extract the professional summary exactly as written.
+
+Return it as a plain string or null.
+
+Do not convert it into HTML.
 
 ========================
 PROJECTS
@@ -73,15 +92,17 @@ PROJECTS
 
 For every project extract:
 
-- title
+- name
+- role
+- url
 - description
 - technologies
-- github
-- live_demo
 
 Preserve the original project descriptions.
 
 Do not rewrite.
+
+"technologies" must be an array of strings.
 
 ========================
 EXPERIENCE
@@ -90,12 +111,18 @@ EXPERIENCE
 Extract:
 
 - company
-- role
+- position
 - location
-- duration
-- responsibilities
+- startDate
+- endDate
+- isCurrent
+- description
 
 Preserve bullet points.
+
+Keep dates exactly as written where possible, but place them into "startDate" and "endDate".
+
+If the role is ongoing, set "isCurrent" to true.
 
 Return an empty array if no experience is present.
 
@@ -107,14 +134,48 @@ Extract:
 
 - institution
 - degree
-- specialization
-- cgpa
-- percentage
-- duration
+- fieldOfStudy
+- location
+- startDate
+- endDate
+- isCurrent
+- description
+
+If the education entry is ongoing, set "isCurrent" to true.
+
+========================
+SKILLS
+========================
+
+Return skills in grouped form.
+
+For every skill group extract:
+
+- category
+- items
+
+"items" must be an array of strings.
+
+Do not flatten grouped skills into a single array.
+
+========================
+LANGUAGES
+========================
+
+For every language extract:
+
+- name
+- proficiency
 
 ========================
 CERTIFICATIONS
 ========================
+
+For every certification extract:
+
+- name
+- issuer
+- date
 
 Return an empty array if none exist.
 
