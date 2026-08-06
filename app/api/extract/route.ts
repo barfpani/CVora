@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { ai } from "@/lib/gemini";
+import { ai } from "@/lib/gemini"; 
 
 
 export async function GET(){
