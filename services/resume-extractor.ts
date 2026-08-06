@@ -46,3 +46,47 @@ function mapExperience(
     experience: ResumeSchema["experience"]
 ): ResumeState["experience"];
 
+function mapEducation(
+    education: ResumeSchema["education"]
+): ResumeState["education"];
+
+function mapProjects(
+    projects: ResumeSchema["projects"]
+): ResumeState["projects"];
+
+function mapSkills(
+    skills: ResumeSchema["skills"]
+): ResumeState["skills"];
+
+function mapLanguages(
+    languages: ResumeSchema["languages"]
+): ResumeState["languages"];
+
+function mapCertifications(
+    certifications: ResumeSchema["certifications"]
+): ResumeState["certifications"];
+
+function buildVisibleSections(
+    mapped : pick < 
+        ResumeState,
+        | "summary"
+        | "workExperience"
+        | "education"
+        | "projects"
+        | "skills"
+        | "languages"
+        | "certifications"
+    >
+): ResumeState["visibleSections"];
+
+function buildDefaultSectionsOrder (): ResumeState["sectionsOrder"];
+
+function buildDefaultTheme(
+    documentName?: string | null
+): ResumeState["theme"];
+
+function toParagraphHtml(value: string | null): string;
+
+function toDescriptionHtml(value: string | null): string;
+
+function createItemId(prefix: string, index: number): string;
