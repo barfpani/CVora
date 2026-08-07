@@ -132,7 +132,7 @@ export interface ExtractResumePdfInput {
 
 export type ExtractResumeInput = ExtractResumeTextInput | ExtractResumePdfInput;
 
-export async function extractStructuredRessume (input: ExtractResumeInput){
+export async function extractStructuredResume (input: ExtractResumeInput){
   const contents = "resumeText" in input ? buildTextContents(input.resumeText) : buildPdfContents(input.pdfBase64, input.mimeType);
 
   const response = await ai.models.generateContent({
