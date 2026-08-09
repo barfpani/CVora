@@ -1,4 +1,4 @@
-import { ExtractResumeInput, extractStructuredResume } from "@/lib/gemini";
+import { extractStructuredResume } from "@/lib/gemini";
 import type { ResumeState } from "@/context/resume-state";
 import { resumeSchema, type ResumeSchema } from "@/schemas/resume.schema";
 import { escape } from "querystring";
@@ -42,7 +42,7 @@ const DEFAULT_SECTIONS_ORDER: ResumeState["sectionsOrder"] = [
 ];
 
 export async function extractResume (
-    input: ExtractResumeInput
+    input: ExtractedResumeInput
 ): Promise<ExtractResumeResult> {
     let raw: unknown;
 
@@ -136,7 +136,7 @@ function mapResumeSchemaToState(
         skills: mapSkills(extracted.skills),
         languages: mapLanguages(extracted.languages),
         certifications: mapCertifications(extracted.certifications),
-        sectionsOrder: buildDefaultSectionsOrder(),
+        sectionsOrder: DEFAULT_SECTIONS_ORDER,
         visibleSections: buildVisibleSections(mappedContent),
         theme: buildDefaultTheme(options?.documentName ?? null),
     };
@@ -185,7 +185,7 @@ function mapEducation(
         fieldOfStudy: item.fieldOfStudy ?? "",
         location: item.location ?? "",
         startDate: item.startDate,
-        endDate: item.endDate ?? (item.isCurrent ? "Present" : ""),
+        endDate: item.endDate ?? (item.isCurrent ? "present" : ""),
         current: item.isCurrent,
         description: item.description ?? "",
     }));
@@ -209,7 +209,7 @@ function mapSkills(
 ): ResumeState["skills"] {
     return skills.map((item, index) => ({
         id: createItemId("skill", index),
-        name: item.category ?? "General",
+        name: item.category ?? "",
         skills: item.items.join(", "),
     }));
 }
