@@ -129,14 +129,14 @@ function mapResumeSchemaToState(
 
     return {
         personalInfo: mapPersonalInfo(extracted.personalInfo),
-        summary: toParagraphHtml(extracted.summary),
-        workExperience: mapExperience(extracted.experience),
-        education: mapEducation(extracted.education),
-        projects: mapProjects(extracted.projects),
-        skills: mapSkills(extracted.skills),
-        languages: mapLanguages(extracted.languages),
-        certifications: mapCertifications(extracted.certifications),
-        sectionsOrder: DEFAULT_SECTIONS_ORDER,
+        summary: mappedContent.summary,
+        workExperience: mappedContent.workExperience,
+        education: mappedContent.education,
+        projects: mappedContent.projects,
+        skills: mappedContent.skills,
+        languages: mappedContent.languages,
+        certifications: mappedContent.certifications,
+        sectionsOrder: buildDefaultSectionsOrder(),
         visibleSections: buildVisibleSections(mappedContent),
         theme: buildDefaultTheme(options?.documentName ?? null),
     };
@@ -169,7 +169,7 @@ function mapExperience(
         position: item.position,
         location: item.location ?? "",
         startDate: item.startDate,
-        endDate: item.endDate ?? (item.isCurrent ? "present" : ""),
+        endDate: item.endDate ?? (item.isCurrent ? "Present" : ""),
         current: item.isCurrent,
         description: toDescriptionHtml(item.description),
     }));
@@ -185,7 +185,7 @@ function mapEducation(
         fieldOfStudy: item.fieldOfStudy ?? "",
         location: item.location ?? "",
         startDate: item.startDate,
-        endDate: item.endDate ?? (item.isCurrent ? "present" : ""),
+        endDate: item.endDate ?? (item.isCurrent ? "Present" : ""),
         current: item.isCurrent,
         description: item.description ?? "",
     }));
@@ -266,7 +266,7 @@ function buildDefaultSectionsOrder (): ResumeState["sectionsOrder"] {
         "projects",
         "skills",
         "languages",
-        "certifications",
+        "certifications"
     ];
 }
 
