@@ -1,7 +1,7 @@
 import { extractStructuredResume } from "@/lib/gemini";
 import type { ResumeState } from "@/context/resume-state";
 import { resumeSchema, type ResumeSchema } from "@/schemas/resume.schema";
-import { escape } from "querystring";
+
 
 export interface ExtractedResumeTextInput {
     resumeText: string;

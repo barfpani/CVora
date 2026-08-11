@@ -1,7 +1,6 @@
-import { GoogleGenAI, HarmCategory, Type } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
 import { RESUME_EXTRACTION_PROMPT } from "@/prompts/extraction-prompt";
-import { nullable } from "zod";
-import { Summary } from "lucide-react";
+
 
 const apiKey = process.env.GEMINI_API_KEY;
 
@@ -36,16 +35,33 @@ const RESUME_RESPONSE_SCHEMA = {
       items: {
         type: Type.OBJECT,
         properties: {
-          institution: {type: Type.STRING},
-          degree: {type: Type.STRING},
-          filedOfStudy: {type: Type.STRING, nullable: true},
+          company: { type: Type.STRING},
+          position: { type: Type.STRING},
           location: {type: Type.STRING, nullable: true},
           startDate: {type: Type.STRING},
           endDate: {type: Type.STRING, nullable: true},
           isCurrent: {type: Type.BOOLEAN},
           description: {type: Type.STRING, nullable: true},
         },
-        requied: ["institution", "degree", "startDate", "isCurrent"],
+        required: ["company", "position", "startDate", "isCurrent"],
+      },
+    },
+
+    education: {
+      type: Type.ARRAY,
+      items: {
+        type: Type.OBJECT,
+        properties: {
+          institution: { type: Type.STRING},
+          degree: { type: Type.STRING},
+          fieldOfStudy: { type: Type.STRING, nullable: true },
+          location: { type: Type.STRING, nullable: true },
+          startDate: { type: Type.STRING },
+          endDate: { type: Type.STRING, nullable: true },
+          isCurrent: { type: Type.BOOLEAN },
+          description: { type: Type.STRING, nullable: true },
+        },
+        required: ["institution", "degree", "startDate", "isCurrent"],
       },
     },
 
@@ -70,9 +86,9 @@ const RESUME_RESPONSE_SCHEMA = {
     skills: {
       type: Type.ARRAY,
       items: {
-        tyep: Type.OBJECT,
+        type: Type.OBJECT,
         properties: {
-          Category: {type: Type.STRING, nullable: true},
+          category: {type: Type.STRING, nullable: true},
           items: {
             type: Type.ARRAY,
             items: { type: Type.STRING},
@@ -140,7 +156,7 @@ export async function extractStructuredResume (input: ExtractResumeInput){
     contents,
     config: {
       systemInstruction: RESUME_EXTRACTION_PROMPT,
-      responseMimeType: "application/pdf",
+      responseMimeType: "application/json",
       responseSchema: RESUME_RESPONSE_SCHEMA,
       temperature: 0,
     },
