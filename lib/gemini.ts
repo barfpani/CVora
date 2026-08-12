@@ -152,7 +152,7 @@ export async function extractStructuredResume (input: ExtractResumeInput){
   const contents = "resumeText" in input ? buildTextContents(input.resumeText) : buildPdfContents(input.pdfBase64, input.mimeType);
 
   const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
+    model: "gemini-3.5-flash-lite",
     contents,
     config: {
       systemInstruction: RESUME_EXTRACTION_PROMPT,

@@ -57,9 +57,73 @@ export default function Home() {
     setIsExporting(false);
   };
 
+  //helper function to handle load PDF
+  
+  async function filetoBase64(file: File): Promise<string>{
+    const arrayBuffer = await file.arrayBuffer();
+    let binary = "";
+    const bytes = new Uint8Array(arrayBuffer);
+
+    for(let i = 0; i < bytes.length; i += 1){
+      binary += String.fromCharCode(bytes[i]);
+    }
+
+    return btoa(binary);
+  }
+
   const handleLoadPDF = () => {
-    alert("PDF import is being rebuilt around the new schema-driven extraction flow and is temporarily unavailable.");
+    if(!confirm("Are you sure you want to load a PDF? This will overwrite your current progress.")) {
+      return;
+    }
+
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = ".pdf,application/pdf";
+
+    fileInput.onchange = async (event : Event) => {
+      const target = event.target as HTMLInputElement;
+      const file = target.files?.[0];
+
+      if(!file) return;
+
+      try{
+        const pdfBase64 = await filetoBase64(file);
+
+        const response = await fetch("/api/extract", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            pdfBase64,
+            mimeType: "application/pdf",
+            fileName: file.name,
+          }),
+        });
+
+        const data = await response.json();
+
+        if(!response.ok || !data.ok) {
+          throw new Error (data.message || "Failed to extract resume from PDF.");
+        }
+
+        dispatch({
+          type: "LOAD_STATE",
+          payload: data.mapped,
+        });
+
+        alert("Resume extracted successfully.");
+      }
+      catch (error){
+        console.error("PDF extraction failed:", error);
+        alert(error instanceof Error ? error.message : "Failed to extract resume.");
+      }
+    };
+
+    fileInput.click();
   };
+
+  
 
   const handleReset = () => {
     if (confirm("Are you sure you want to load the sample data? This will overwrite your current progress.")) {
