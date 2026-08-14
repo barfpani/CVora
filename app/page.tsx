@@ -18,8 +18,8 @@ import {
   Moon,
   ZoomIn,
   ZoomOut,
-  FileCheck,
   FileText,
+  Origami,
 } from "lucide-react";
 
 export default function Home() {
@@ -195,7 +195,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="h-10 w-10 rounded-xl bg-orange-200 flex items-center justify-center dark:bg-orange-200">
-              <FileCheck className="h-5 w-5 text-zinc dark:text-zinc-900" />
+              <Origami className="h-8 w-8 text-zinc dark:text-zinc-900" />
             </div>
             <div>
               <h1 className="text-xl font-bold tracking-tight bg-gradient-to-r from-zinc-900 to-zinc-700 dark:from-zinc-100 dark:to-zinc-300 bg-clip-text text-transparent">
