@@ -58,8 +58,8 @@ const computerModern = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Resume Craft",
-  description: "Build, customize, and export professional A4 resumes instantly with real-time live preview.",
+  title: "CVora",
+  description: "With CVora you can Edit your existing resume, or you can build your own resume with ease which will help you to get your dream job.",
 };
 
 export default function RootLayout({
