@@ -40,7 +40,9 @@ const PAGE_PADDING_X = 52;
 const PAGE_PADDING_Y = 48;
 
 interface ResumeSheetProps {
+  controlledPages?: string[][];
   onPageCountChange?: (pageCount: number) => void;
+  onPagesChange?: (pages: string[][]) => void;
 }
 
 interface SortableSectionProps {
@@ -58,7 +60,11 @@ interface PageFrameProps {
   state: ResumeState;
 }
 
-export default function ResumeSheet({ onPageCountChange }: ResumeSheetProps) {
+export default function ResumeSheet({
+  controlledPages,
+  onPageCountChange,
+  onPagesChange,
+}: ResumeSheetProps) {
   const { state, dispatch } = useResume();
   const { theme, sectionsOrder, visibleSections } = state;
   const [pages, setPages] = useState<string[][]>([[]]);
@@ -120,10 +126,12 @@ export default function ResumeSheet({ onPageCountChange }: ResumeSheetProps) {
   );
 
   useLayoutEffect(() => {
+    if (controlledPages) return;
     setPages(visibleSectionIds.length > 0 ? [visibleSectionIds] : [[]]);
-  }, [paginationKey, visibleSectionIds]);
+  }, [controlledPages, paginationKey, visibleSectionIds]);
 
   useLayoutEffect(() => {
+    if (controlledPages) return;
     const frame = requestAnimationFrame(() => {
       setPages((currentPages) => {
         const nextPages = rebalancePages(currentPages, pageContentRefs.current);
@@ -132,11 +140,14 @@ export default function ResumeSheet({ onPageCountChange }: ResumeSheetProps) {
     });
 
     return () => cancelAnimationFrame(frame);
-  }, [pages, paginationKey]);
+  }, [controlledPages, pages, paginationKey]);
+
+  const renderedPages = controlledPages ?? pages;
 
   useEffect(() => {
-    onPageCountChange?.(pages.length || 1);
-  }, [onPageCountChange, pages.length]);
+    onPageCountChange?.(renderedPages.length || 1);
+    onPagesChange?.(renderedPages);
+  }, [onPageCountChange, onPagesChange, renderedPages]);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -162,7 +173,7 @@ export default function ResumeSheet({ onPageCountChange }: ResumeSheetProps) {
         onDragEnd={handleDragEnd}
       >
         <SortableContext items={visibleSectionIds} strategy={verticalListSortingStrategy}>
-          {pages.map((pageSectionIds, pageIndex) => (
+          {renderedPages.map((pageSectionIds, pageIndex) => (
             <PageFrame
               key={`page-${pageIndex}`}
               className={fontClass}
