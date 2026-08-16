@@ -14,7 +14,7 @@ import {
   Download,
   Trash2,
   RefreshCw,
-  Sun,
+  Sun, 
   Moon,
   ZoomIn,
   ZoomOut,
@@ -30,6 +30,7 @@ export default function Home() {
   const [isExporting, setIsExporting] = useState(false);
   const [zoomScale, setZoomScale] = useState<number>(0.60); // Default zoom scale to fit standard laptops
   const [pageCount, setPageCount] = useState(1);
+  const [sharedPages, setSharedPages] = useState<string[][]>([[]]);
 
   // Prevent hydration mismatches
   useEffect(() => {
@@ -320,7 +321,7 @@ export default function Home() {
                     left: 0,
                   }}
                 >
-                  <ResumeSheet onPageCountChange={setPageCount} />
+                  <ResumeSheet onPageCountChange={setPageCount} onPagesChange={setSharedPages} />
                 </div>
               </div>
             </div>
@@ -334,7 +335,7 @@ export default function Home() {
         className="hidden min-h-screen bg-white px-0 py-0 text-zinc-900"
       >
         <div className="mx-auto flex w-fit flex-col gap-0">
-          <ResumeSheet />
+          <ResumeSheet controlledPages={sharedPages} />
         </div>
       </main>
     </>
