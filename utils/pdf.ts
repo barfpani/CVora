@@ -1,7 +1,6 @@
 /**
  * Triggers the browser print dialog from the current window so the user can
- * save a text-based PDF generated from real HTML instead of a raster snapshot
- * which was the issue before the refactor.
+ * save a text-based PDF generated from real HTML.
  */
 export async function exportToPDF(_elementId: string, filename: string = "resume.pdf") {
   const originalTitle = document.title;

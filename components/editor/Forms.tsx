@@ -30,7 +30,26 @@ import {
   EyeOff,
   Settings,
   TextCursorInput,
+  GripVertical,
 } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  DragEndEvent,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
+import {
+  arrayMove,
+  sortableKeyboardCoordinates,
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 const FONT_OPTIONS = [
   { name: "Inter (Sans)", value: "inter" },
@@ -772,26 +791,192 @@ function EducationForm() {
   );
 }
 
+// ── Sortable project card ──────────────────────────────────────────────────
+interface SortableProjectCardProps {
+  proj: Project;
+  isExpanded: boolean;
+  onToggle: (id: string) => void;
+  onUpdate: (id: string, data: Partial<Project>) => void;
+  onDelete: (id: string) => void;
+}
+
+function SortableProjectCard({
+  proj,
+  isExpanded,
+  onToggle,
+  onUpdate,
+  onDelete,
+}: SortableProjectCardProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: proj.id });
+
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 50 : "auto",
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden bg-zinc-50/30 dark:bg-zinc-900/10 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
+    >
+      {/* Header */}
+      <div
+        className="flex items-center justify-between px-4 py-3 bg-zinc-50 dark:bg-zinc-900/60 select-none"
+      >
+        {/* Drag handle */}
+        <button
+          {...attributes}
+          {...listeners}
+          className="p-1 mr-2 text-zinc-300 hover:text-orange-400 rounded cursor-grab active:cursor-grabbing transition-colors shrink-0"
+          title="Drag to reorder"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <GripVertical className="h-4 w-4" />
+        </button>
+
+        {/* Title — clicking expands/collapses */}
+        <div
+          className="flex-1 min-w-0 pr-4 cursor-pointer"
+          onClick={() => onToggle(proj.id)}
+        >
+          <h4 className="text-sm font-semibold text-zinc-800 dark:text-zinc-200 truncate">
+            {proj.name || "New Project"}
+          </h4>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
+            {proj.role || "Creator / Contributor"}
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => onDelete(proj.id)}
+            className="p-1.5 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-md transition-colors cursor-pointer"
+            title="Delete Entry"
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => onToggle(proj.id)}
+            className="p-1.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 rounded-md transition-colors cursor-pointer"
+          >
+            {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </button>
+        </div>
+      </div>
+
+      {/* Form fields */}
+      {isExpanded && (
+        <div className="p-4 bg-white dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-800 space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="text-[11px] font-semibold text-zinc-500 uppercase">Project Name</label>
+              <input
+                type="text"
+                value={proj.name}
+                onChange={(e) => onUpdate(proj.id, { name: e.target.value })}
+                placeholder="e.g. Resume Craft"
+                className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[11px] font-semibold text-zinc-500 uppercase">Your Role</label>
+              <input
+                type="text"
+                value={proj.role}
+                onChange={(e) => onUpdate(proj.id, { role: e.target.value })}
+                placeholder="e.g. Lead Developer / Creator"
+                className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[11px] font-semibold text-zinc-500 uppercase">Project URL</label>
+              <input
+                type="text"
+                value={proj.url}
+                onChange={(e) => onUpdate(proj.id, { url: e.target.value })}
+                placeholder="e.g. https://resumecraft.dev"
+                className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[11px] font-semibold text-zinc-500 uppercase">Technologies Used</label>
+              <input
+                type="text"
+                value={proj.technologies}
+                onChange={(e) => onUpdate(proj.id, { technologies: e.target.value })}
+                placeholder="e.g. Next.js, React, Tailwind CSS"
+                className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-semibold text-zinc-500 uppercase">Description</label>
+            <RichTextEditor
+              value={proj.description}
+              onChange={(html) => onUpdate(proj.id, { description: html })}
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Projects section form ──────────────────────────────────────────────────
 function ProjectsForm() {
   const { state, dispatch } = useResume();
   const [expandedId, setExpandedId] = useState<string | null>(
     state.projects[0]?.id || null
   );
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
   const toggleExpand = (id: string) => {
-    setExpandedId(expandedId === id ? null : id);
+    setExpandedId((prev) => (prev === id ? null : id));
   };
 
   const updateItem = (id: string, data: Partial<Project>) => {
     dispatch({ type: "UPDATE_PROJECT", payload: { id, data } });
   };
 
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = state.projects.findIndex((p) => p.id === active.id);
+    const newIndex = state.projects.findIndex((p) => p.id === over.id);
+    if (oldIndex !== -1 && newIndex !== -1) {
+      dispatch({
+        type: "REORDER_PROJECT",
+        payload: arrayMove(state.projects, oldIndex, newIndex),
+      });
+    }
+  };
+
+  const projectIds = state.projects.map((p) => p.id);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Projects</h3>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">Showcase relevant personal or open-source software projects.</p>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            Showcase relevant personal or open-source software projects.
+          </p>
         </div>
         <button
           onClick={() => {
@@ -808,109 +993,40 @@ function ProjectsForm() {
         </button>
       </div>
 
-      <div className="space-y-3">
-        {state.projects.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-8 px-4 border border-dashed border-orange-100 dark:border-zinc-800 rounded-lg text-zinc-400 dark:text-zinc-500 text-sm">
-            No projects added yet. Click "Add Project" to begin.
-          </div>
-        ) : (
-          state.projects.map((proj, idx) => {
-            const isExpanded = expandedId === proj.id;
-            return (
-              <div
-                key={proj.id}
-                className="border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden bg-zinc-50/30 dark:bg-zinc-900/10 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
-              >
-                {/* Header Toggle */}
-                <div
-                  className="flex items-center justify-between px-4 py-3 bg-zinc-50 dark:bg-zinc-900/60 cursor-pointer select-none"
-                  onClick={() => toggleExpand(proj.id)}
-                >
-                  <div className="flex-1 min-w-0 pr-4">
-                    <h4 className="text-sm font-semibold text-zinc-800 dark:text-zinc-200 truncate">
-                      {proj.name || "New Project"}
-                    </h4>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
-                      {proj.role || "Creator / Contributor"}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                    <button
-                      onClick={() => dispatch({ type: "DELETE_PROJECT", payload: proj.id })}
-                      className="p-1.5 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-md transition-colors cursor-pointer"
-                      title="Delete Entry"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => toggleExpand(proj.id)}
-                      className="p-1.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 rounded-md transition-colors cursor-pointer"
-                    >
-                      {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                    </button>
-                  </div>
-                </div>
+      {state.projects.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-8 px-4 border border-dashed border-orange-100 dark:border-zinc-800 rounded-lg text-zinc-400 dark:text-zinc-500 text-sm">
+          No projects added yet. Click &quot;Add Project&quot; to begin.
+        </div>
+      ) : (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          modifiers={[restrictToVerticalAxis]}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext items={projectIds} strategy={verticalListSortingStrategy}>
+            <div className="space-y-3">
+              {state.projects.map((proj) => (
+                <SortableProjectCard
+                  key={proj.id}
+                  proj={proj}
+                  isExpanded={expandedId === proj.id}
+                  onToggle={toggleExpand}
+                  onUpdate={updateItem}
+                  onDelete={(id) => dispatch({ type: "DELETE_PROJECT", payload: id })}
+                />
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
+      )}
 
-                {/* Form fields */}
-                {isExpanded && (
-                  <div className="p-4 bg-white dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-800 space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-1">
-                        <label className="text-[11px] font-semibold text-zinc-500 uppercase">Project Name</label>
-                        <input
-                          type="text"
-                          value={proj.name}
-                          onChange={(e) => updateItem(proj.id, { name: e.target.value })}
-                          placeholder="e.g. Resume Craft"
-                          className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <label className="text-[11px] font-semibold text-zinc-500 uppercase">Your Role</label>
-                        <input
-                          type="text"
-                          value={proj.role}
-                          onChange={(e) => updateItem(proj.id, { role: e.target.value })}
-                          placeholder="e.g. Lead Developer / Creator"
-                          className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <label className="text-[11px] font-semibold text-zinc-500 uppercase">Project URL</label>
-                        <input
-                          type="text"
-                          value={proj.url}
-                          onChange={(e) => updateItem(proj.id, { url: e.target.value })}
-                          placeholder="e.g. https://resumecraft.dev"
-                          className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <label className="text-[11px] font-semibold text-zinc-500 uppercase">Technologies Used</label>
-                        <input
-                          type="text"
-                          value={proj.technologies}
-                          onChange={(e) => updateItem(proj.id, { technologies: e.target.value })}
-                          placeholder="e.g. Next.js, React, Tailwind CSS"
-                          className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-[11px] font-semibold text-zinc-500 uppercase">Description</label>
-                      <RichTextEditor
-                        value={proj.description}
-                        onChange={(html) => updateItem(proj.id, { description: html })}
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })
-        )}
-      </div>
+      {state.projects.length > 1 && (
+        <p className="text-[11px] text-zinc-400 dark:text-zinc-500 flex items-center gap-1.5">
+          <GripVertical className="h-3 w-3 shrink-0" />
+          Drag the grip handle on any project card to reorder it.
+        </p>
+      )}
     </div>
   );
 }
