@@ -288,14 +288,17 @@ type ResumeAction =
   | { type: "ADD_SKILL" }
   | { type: "UPDATE_SKILL"; payload: { id: string; data: Partial<SkillCategory> } }
   | { type: "DELETE_SKILL"; payload: string }
+  | { type: "REORDER_SKILL"; payload: SkillCategory[] }
   // Languages
   | { type: "ADD_LANGUAGE" }
   | { type: "UPDATE_LANGUAGE"; payload: { id: string; data: Partial<Language> } }
   | { type: "DELETE_LANGUAGE"; payload: string }
+  | { type: "REORDER_LANGUAGE"; payload: Language[] }
   // Certifications
   | { type: "ADD_CERTIFICATION" }
   | { type: "UPDATE_CERTIFICATION"; payload: { id: string; data: Partial<Certification> } }
   | { type: "DELETE_CERTIFICATION"; payload: string }
+  | { type: "REORDER_CERTIFICATION"; payload: Certification[] }
   // Sections and Visibility
   | { type: "REORDER_SECTIONS"; payload: string[] }
   | { type: "TOGGLE_SECTION_VISIBILITY"; payload: string }
@@ -439,6 +442,11 @@ function resumeReducer(state: ResumeState, action: ResumeAction): ResumeState {
         ...state,
         skills: state.skills.filter((item) => item.id !== action.payload),
       };
+    case "REORDER_SKILL":
+      return {
+        ...state,
+        skills: action.payload,
+      };
     case "ADD_LANGUAGE": {
       const newItem: Language = {
         id: `lang-${Date.now()}`,
@@ -461,6 +469,11 @@ function resumeReducer(state: ResumeState, action: ResumeAction): ResumeState {
       return {
         ...state,
         languages: state.languages.filter((item) => item.id !== action.payload),
+      };
+    case "REORDER_LANGUAGE":
+      return {
+        ...state,
+        languages: action.payload,
       };
     case "ADD_CERTIFICATION": {
       const newItem: Certification = {
@@ -485,6 +498,11 @@ function resumeReducer(state: ResumeState, action: ResumeAction): ResumeState {
       return {
         ...state,
         certifications: state.certifications.filter((item) => item.id !== action.payload),
+      };
+    case "REORDER_CERTIFICATION":
+      return {
+        ...state,
+        certifications: action.payload,
       };
     case "REORDER_SECTIONS":
       return {

@@ -36,20 +36,15 @@ import {
   DndContext,
   closestCenter,
   DragEndEvent,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
 } from "@dnd-kit/core";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import {
-  arrayMove,
-  sortableKeyboardCoordinates,
   SortableContext,
   useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { useSharedSensors, handleDragEndHelper } from "../../utils/dnd-utils";
 
 const FONT_OPTIONS = [
   { name: "Inter (Sans)", value: "inter" },
@@ -439,11 +434,177 @@ function SummaryForm() {
   );
 }
 
+interface SortableExperienceCardProps {
+  exp: WorkExperience;
+  isExpanded: boolean;
+  onToggle: (id: string) => void;
+  onUpdate: (id: string, data: Partial<WorkExperience>) => void;
+  onDelete: (id: string) => void;
+}
+
+function SortableExperienceCard({
+  exp,
+  isExpanded,
+  onToggle,
+  onUpdate,
+  onDelete,
+}: SortableExperienceCardProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: exp.id });
+
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 50 : "auto",
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden bg-zinc-50/30 dark:bg-zinc-900/10 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
+    >
+      {/* Header Toggle */}
+      <div
+        className="flex items-center justify-between px-4 py-3 bg-zinc-50 dark:bg-zinc-900/60 select-none"
+      >
+        <button
+          {...attributes}
+          {...listeners}
+          className="p-1 mr-2 text-zinc-300 hover:text-orange-400 rounded cursor-grab active:cursor-grabbing transition-colors shrink-0"
+          title="Drag to reorder"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <GripVertical className="h-4 w-4" />
+        </button>
+
+        <div
+          className="flex-1 min-w-0 pr-4 cursor-pointer"
+          onClick={() => onToggle(exp.id)}
+        >
+          <h4 className="text-sm font-semibold text-zinc-800 dark:text-zinc-200 truncate">
+            {exp.position || "New Role"}
+          </h4>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
+            {exp.company || "New Company"}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => onDelete(exp.id)}
+            className="p-1.5 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-md transition-colors cursor-pointer"
+            title="Delete Entry"
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => onToggle(exp.id)}
+            className="p-1.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 rounded-md transition-colors cursor-pointer"
+          >
+            {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </button>
+        </div>
+      </div>
+
+      {/* Form fields */}
+      {isExpanded && (
+        <div className="p-4 bg-white dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-800 space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="text-[11px] font-semibold text-zinc-500 uppercase">Position</label>
+              <input
+                type="text"
+                value={exp.position}
+                onChange={(e) => onUpdate(exp.id, { position: e.target.value })}
+                placeholder="e.g. Senior Frontend Architect"
+                className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[11px] font-semibold text-zinc-500 uppercase">Company</label>
+              <input
+                type="text"
+                value={exp.company}
+                onChange={(e) => onUpdate(exp.id, { company: e.target.value })}
+                placeholder="e.g. Google Inc."
+                className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[11px] font-semibold text-zinc-500 uppercase">Location</label>
+              <input
+                type="text"
+                value={exp.location}
+                onChange={(e) => onUpdate(exp.id, { location: e.target.value })}
+                placeholder="e.g. San Francisco, CA"
+                className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-1">
+                <label className="text-[11px] font-semibold text-zinc-500 uppercase">Start Date</label>
+                <input
+                  type="text"
+                  value={exp.startDate}
+                  onChange={(e) => onUpdate(exp.id, { startDate: e.target.value })}
+                  placeholder="e.g. Jun 2021"
+                  className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[11px] font-semibold text-zinc-500 uppercase">End Date</label>
+                <input
+                  type="text"
+                  value={exp.current ? "" : exp.endDate}
+                  disabled={exp.current}
+                  onChange={(e) => onUpdate(exp.id, { endDate: e.target.value })}
+                  placeholder={exp.current ? "Present" : "e.g. Dec 2023"}
+                  className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200 disabled:opacity-50 disabled:bg-zinc-50 dark:disabled:bg-zinc-900"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id={`current-job-${exp.id}`}
+              checked={exp.current}
+              onChange={(e) => onUpdate(exp.id, { current: e.target.checked })}
+              className="rounded border-zinc-500 dark:border-zinc-700 text-orange-600 focus:ring-blue-500"
+            />
+            <label htmlFor={`current-job-${exp.id}`} className="text-xs text-zinc-600 dark:text-zinc-400 font-medium">
+              I am currently working in this role
+            </label>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-semibold text-zinc-500 uppercase">Description / Key Achievements</label>
+            <RichTextEditor
+              value={exp.description}
+              onChange={(html) => onUpdate(exp.id, { description: html })}
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ExperienceForm() {
   const { state, dispatch } = useResume();
   const [expandedId, setExpandedId] = useState<string | null>(
     state.workExperience[0]?.id || null
   );
+
+  const sensors = useSharedSensors();
 
   const toggleExpand = (id: string) => {
     setExpandedId(expandedId === id ? null : id);
@@ -452,6 +613,14 @@ function ExperienceForm() {
   const updateItem = (id: string, data: Partial<WorkExperience>) => {
     dispatch({ type: "UPDATE_WORK_EXPERIENCE", payload: { id, data } });
   };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    handleDragEndHelper(event, state.workExperience, (reordered) => {
+      dispatch({ type: "REORDER_WORK_EXPERIENCE", payload: reordered });
+    });
+  };
+
+  const experienceIds = state.workExperience.map((exp) => exp.id);
 
   return (
     <div className="min-h-full flex flex-col gap-6">
@@ -476,135 +645,217 @@ function ExperienceForm() {
         </button>
       </div>
 
-      <div className="space-y-3">
-        {state.workExperience.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-8 px-4 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-400 dark:text-zinc-500 text-sm">
-            No work experience added yet. Click "Add Job" to begin.
-          </div>
-        ) : (
-          state.workExperience.map((exp, idx) => {
-            const isExpanded = expandedId === exp.id;
-            return (
-              <div
-                key={exp.id}
-                className="border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden bg-zinc-50/30 dark:bg-zinc-900/10 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
-              >
-                {/* Header Toggle */}
-                <div
-                  className="flex items-center justify-between px-4 py-3 bg-zinc-50 dark:bg-zinc-900/60 cursor-pointer select-none"
-                  onClick={() => toggleExpand(exp.id)}
-                >
-                  <div className="flex-1 min-w-0 pr-4">
-                    <h4 className="text-sm font-semibold text-zinc-800 dark:text-zinc-200 truncate">
-                      {exp.position || "New Role"}
-                    </h4>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
-                      {exp.company || "New Company"}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                    <button
-                      onClick={() => dispatch({ type: "DELETE_WORK_EXPERIENCE", payload: exp.id })}
-                      className="p-1.5 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-md transition-colors cursor-pointer"
-                      title="Delete Entry"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => toggleExpand(exp.id)}
-                      className="p-1.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 rounded-md transition-colors cursor-pointer"
-                    >
-                      {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                    </button>
-                  </div>
-                </div>
+      {state.workExperience.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-8 px-4 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-400 dark:text-zinc-500 text-sm">
+          No work experience added yet. Click "Add Job" to begin.
+        </div>
+      ) : (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          modifiers={[restrictToVerticalAxis]}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext items={experienceIds} strategy={verticalListSortingStrategy}>
+            <div className="space-y-3">
+              {state.workExperience.map((exp) => (
+                <SortableExperienceCard
+                  key={exp.id}
+                  exp={exp}
+                  isExpanded={expandedId === exp.id}
+                  onToggle={toggleExpand}
+                  onUpdate={updateItem}
+                  onDelete={(id) => dispatch({ type: "DELETE_WORK_EXPERIENCE", payload: id })}
+                />
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
+      )}
 
-                {/* Form fields */}
-                {isExpanded && (
-                  <div className="p-4 bg-white dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-800 space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-1">
-                        <label className="text-[11px] font-semibold text-zinc-500 uppercase">Position</label>
-                        <input
-                          type="text"
-                          value={exp.position}
-                          onChange={(e) => updateItem(exp.id, { position: e.target.value })}
-                          placeholder="e.g. Senior Frontend Architect"
-                          className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <label className="text-[11px] font-semibold text-zinc-500 uppercase">Company</label>
-                        <input
-                          type="text"
-                          value={exp.company}
-                          onChange={(e) => updateItem(exp.id, { company: e.target.value })}
-                          placeholder="e.g. Google Inc."
-                          className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <label className="text-[11px] font-semibold text-zinc-500 uppercase">Location</label>
-                        <input
-                          type="text"
-                          value={exp.location}
-                          onChange={(e) => updateItem(exp.id, { location: e.target.value })}
-                          placeholder="e.g. San Francisco, CA"
-                          className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
-                        />
-                      </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="space-y-1">
-                          <label className="text-[11px] font-semibold text-zinc-500 uppercase">Start Date</label>
-                          <input
-                            type="text"
-                            value={exp.startDate}
-                            onChange={(e) => updateItem(exp.id, { startDate: e.target.value })}
-                            placeholder="e.g. Jun 2021"
-                            className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
-                          />
-                        </div>
-                        <div className="space-y-1">
-                          <label className="text-[11px] font-semibold text-zinc-500 uppercase">End Date</label>
-                          <input
-                            type="text"
-                            value={exp.current ? "" : exp.endDate}
-                            disabled={exp.current}
-                            onChange={(e) => updateItem(exp.id, { endDate: e.target.value })}
-                            placeholder={exp.current ? "Present" : "e.g. Dec 2023"}
-                            className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200 disabled:opacity-50 disabled:bg-zinc-50 dark:disabled:bg-zinc-900"
-                          />
-                        </div>
-                      </div>
-                    </div>
+      {state.workExperience.length > 1 && (
+        <p className="text-[11px] text-zinc-400 dark:text-zinc-500 flex items-center gap-1.5">
+          <GripVertical className="h-3 w-3 shrink-0" />
+          Drag the grip handle on any job card to reorder it.
+        </p>
+      )}
+    </div>
+  );
+}
 
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        id={`current-job-${exp.id}`}
-                        checked={exp.current}
-                        onChange={(e) => updateItem(exp.id, { current: e.target.checked })}
-                        className="rounded border-zinc-500 dark:border-zinc-700 text-orange-600 focus:ring-blue-500"
-                      />
-                      <label htmlFor={`current-job-${exp.id}`} className="text-xs text-zinc-600 dark:text-zinc-400 font-medium">
-                        I am currently working in this role
-                      </label>
-                    </div>
+interface SortableEducationCardProps {
+  edu: Education;
+  isExpanded: boolean;
+  onToggle: (id: string) => void;
+  onUpdate: (id: string, data: Partial<Education>) => void;
+  onDelete: (id: string) => void;
+}
 
-                    <div className="space-y-1.5">
-                      <label className="text-[11px] font-semibold text-zinc-500 uppercase">Description / Key Achievements</label>
-                      <RichTextEditor
-                        value={exp.description}
-                        onChange={(html) => updateItem(exp.id, { description: html })}
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })
-        )}
+function SortableEducationCard({
+  edu,
+  isExpanded,
+  onToggle,
+  onUpdate,
+  onDelete,
+}: SortableEducationCardProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: edu.id });
+
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 50 : "auto",
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden bg-zinc-50/30 dark:bg-zinc-900/10 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
+    >
+      {/* Header Toggle */}
+      <div
+        className="flex items-center justify-between px-4 py-3 bg-zinc-50 dark:bg-zinc-900/60 select-none"
+      >
+        <button
+          {...attributes}
+          {...listeners}
+          className="p-1 mr-2 text-zinc-300 hover:text-orange-400 rounded cursor-grab active:cursor-grabbing transition-colors shrink-0"
+          title="Drag to reorder"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <GripVertical className="h-4 w-4" />
+        </button>
+
+        <div
+          className="flex-1 min-w-0 pr-4 cursor-pointer"
+          onClick={() => onToggle(edu.id)}
+        >
+          <h4 className="text-sm font-semibold text-zinc-800 dark:text-zinc-200 truncate">
+            {edu.degree ? `${edu.degree} in ${edu.fieldOfStudy || "Field"}` : "New Degree"}
+          </h4>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
+            {edu.school || "New Institution"}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => onDelete(edu.id)}
+            className="p-1.5 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-md transition-colors cursor-pointer"
+            title="Delete Entry"
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => onToggle(edu.id)}
+            className="p-1.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 rounded-md transition-colors cursor-pointer"
+          >
+            {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </button>
+        </div>
       </div>
+
+      {/* Form fields */}
+      {isExpanded && (
+        <div className="p-4 bg-white dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-800 space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="text-[11px] font-semibold text-zinc-500 uppercase">School / University</label>
+              <input
+                type="text"
+                value={edu.school}
+                onChange={(e) => onUpdate(edu.id, { school: e.target.value })}
+                placeholder="e.g. UC Berkeley"
+                className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[11px] font-semibold text-zinc-500 uppercase">Degree</label>
+              <input
+                type="text"
+                value={edu.degree}
+                onChange={(e) => onUpdate(edu.id, { degree: e.target.value })}
+                placeholder="e.g. B.S. or M.S."
+                className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[11px] font-semibold text-zinc-500 uppercase">Field of Study</label>
+              <input
+                type="text"
+                value={edu.fieldOfStudy}
+                onChange={(e) => onUpdate(edu.id, { fieldOfStudy: e.target.value })}
+                placeholder="e.g. Computer Science"
+                className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[11px] font-semibold text-zinc-500 uppercase">Location</label>
+              <input
+                type="text"
+                value={edu.location}
+                onChange={(e) => onUpdate(edu.id, { location: e.target.value })}
+                placeholder="e.g. Berkeley, CA"
+                className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-1">
+                <label className="text-[11px] font-semibold text-zinc-500 uppercase">Start Date</label>
+                <input
+                  type="text"
+                  value={edu.startDate}
+                  onChange={(e) => onUpdate(edu.id, { startDate: e.target.value })}
+                  placeholder="e.g. Sep 2017"
+                  className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[11px] font-semibold text-zinc-500 uppercase">Graduation / End Date</label>
+                <input
+                  type="text"
+                  value={edu.current ? "" : edu.endDate}
+                  disabled={edu.current}
+                  onChange={(e) => onUpdate(edu.id, { endDate: e.target.value })}
+                  placeholder={edu.current ? "Ongoing" : "e.g. May 2021"}
+                  className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200 disabled:opacity-50 disabled:bg-zinc-50 dark:disabled:bg-zinc-900"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id={`current-edu-${edu.id}`}
+              checked={edu.current}
+              onChange={(e) => onUpdate(edu.id, { current: e.target.checked })}
+              className="rounded border-zinc-300 dark:border-zinc-700 text-blue-600 focus:ring-blue-500"
+            />
+            <label htmlFor={`current-edu-${edu.id}`} className="text-xs text-zinc-600 dark:text-zinc-400 font-medium">
+              I am currently studying here
+            </label>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-[11px] font-semibold text-zinc-500 uppercase">Additional Info / Accomplishments</label>
+            <textarea
+              value={edu.description}
+              onChange={(e) => onUpdate(edu.id, { description: e.target.value })}
+              placeholder="e.g. GPA 3.9, Courses in AI, President of Hackers club..."
+              rows={3}
+              className="w-full px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -615,6 +866,8 @@ function EducationForm() {
     state.education[0]?.id || null
   );
 
+  const sensors = useSharedSensors();
+
   const toggleExpand = (id: string) => {
     setExpandedId(expandedId === id ? null : id);
   };
@@ -622,6 +875,14 @@ function EducationForm() {
   const updateItem = (id: string, data: Partial<Education>) => {
     dispatch({ type: "UPDATE_EDUCATION", payload: { id, data } });
   };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    handleDragEndHelper(event, state.education, (reordered) => {
+      dispatch({ type: "REORDER_EDUCATION", payload: reordered });
+    });
+  };
+
+  const educationIds = state.education.map((edu) => edu.id);
 
   return (
     <div className="space-y-6">
@@ -645,148 +906,40 @@ function EducationForm() {
         </button>
       </div>
 
-      <div className="space-y-3">
-        {state.education.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-8 px-4 border border-dashed border-orange-100 dark:border-zinc-800 rounded-lg text-zinc-400 dark:text-zinc-500 text-sm">
-            No education history added yet. Click "Add School" to begin.
-          </div>
-        ) : (
-          state.education.map((edu, idx) => {
-            const isExpanded = expandedId === edu.id;
-            return (
-              <div
-                key={edu.id}
-                className="border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden bg-zinc-50/30 dark:bg-zinc-900/10 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
-              >
-                {/* Header Toggle */}
-                <div
-                  className="flex items-center justify-between px-4 py-3 bg-zinc-50 dark:bg-zinc-900/60 cursor-pointer select-none"
-                  onClick={() => toggleExpand(edu.id)}
-                >
-                  <div className="flex-1 min-w-0 pr-4">
-                    <h4 className="text-sm font-semibold text-zinc-800 dark:text-zinc-200 truncate">
-                      {edu.degree ? `${edu.degree} in ${edu.fieldOfStudy || "Field"}` : "New Degree"}
-                    </h4>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
-                      {edu.school || "New Institution"}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                    <button
-                      onClick={() => dispatch({ type: "DELETE_EDUCATION", payload: edu.id })}
-                      className="p-1.5 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-md transition-colors cursor-pointer"
-                      title="Delete Entry"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => toggleExpand(edu.id)}
-                      className="p-1.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 rounded-md transition-colors cursor-pointer"
-                    >
-                      {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                    </button>
-                  </div>
-                </div>
+      {state.education.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-8 px-4 border border-dashed border-orange-100 dark:border-zinc-800 rounded-lg text-zinc-400 dark:text-zinc-500 text-sm">
+          No education history added yet. Click "Add School" to begin.
+        </div>
+      ) : (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          modifiers={[restrictToVerticalAxis]}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext items={educationIds} strategy={verticalListSortingStrategy}>
+            <div className="space-y-3">
+              {state.education.map((edu) => (
+                <SortableEducationCard
+                  key={edu.id}
+                  edu={edu}
+                  isExpanded={expandedId === edu.id}
+                  onToggle={toggleExpand}
+                  onUpdate={updateItem}
+                  onDelete={(id) => dispatch({ type: "DELETE_EDUCATION", payload: id })}
+                />
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
+      )}
 
-                {/* Form fields */}
-                {isExpanded && (
-                  <div className="p-4 bg-white dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-800 space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-1">
-                        <label className="text-[11px] font-semibold text-zinc-500 uppercase">School / University</label>
-                        <input
-                          type="text"
-                          value={edu.school}
-                          onChange={(e) => updateItem(edu.id, { school: e.target.value })}
-                          placeholder="e.g. UC Berkeley"
-                          className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <label className="text-[11px] font-semibold text-zinc-500 uppercase">Degree</label>
-                        <input
-                          type="text"
-                          value={edu.degree}
-                          onChange={(e) => updateItem(edu.id, { degree: e.target.value })}
-                          placeholder="e.g. B.S. or M.S."
-                          className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <label className="text-[11px] font-semibold text-zinc-500 uppercase">Field of Study</label>
-                        <input
-                          type="text"
-                          value={edu.fieldOfStudy}
-                          onChange={(e) => updateItem(edu.id, { fieldOfStudy: e.target.value })}
-                          placeholder="e.g. Computer Science"
-                          className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <label className="text-[11px] font-semibold text-zinc-500 uppercase">Location</label>
-                        <input
-                          type="text"
-                          value={edu.location}
-                          onChange={(e) => updateItem(edu.id, { location: e.target.value })}
-                          placeholder="e.g. Berkeley, CA"
-                          className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
-                        />
-                      </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="space-y-1">
-                          <label className="text-[11px] font-semibold text-zinc-500 uppercase">Start Date</label>
-                          <input
-                            type="text"
-                            value={edu.startDate}
-                            onChange={(e) => updateItem(edu.id, { startDate: e.target.value })}
-                            placeholder="e.g. Sep 2017"
-                            className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
-                          />
-                        </div>
-                        <div className="space-y-1">
-                          <label className="text-[11px] font-semibold text-zinc-500 uppercase">Graduation / End Date</label>
-                          <input
-                            type="text"
-                            value={edu.current ? "" : edu.endDate}
-                            disabled={edu.current}
-                            onChange={(e) => updateItem(edu.id, { endDate: e.target.value })}
-                            placeholder={edu.current ? "Ongoing" : "e.g. May 2021"}
-                            className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200 disabled:opacity-50 disabled:bg-zinc-50 dark:disabled:bg-zinc-900"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        id={`current-edu-${edu.id}`}
-                        checked={edu.current}
-                        onChange={(e) => updateItem(edu.id, { current: e.target.checked })}
-                        className="rounded border-zinc-300 dark:border-zinc-700 text-blue-600 focus:ring-blue-500"
-                      />
-                      <label htmlFor={`current-edu-${edu.id}`} className="text-xs text-zinc-600 dark:text-zinc-400 font-medium">
-                        I am currently studying here
-                      </label>
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-[11px] font-semibold text-zinc-500 uppercase">Additional Info / Accomplishments</label>
-                      <textarea
-                        value={edu.description}
-                        onChange={(e) => updateItem(edu.id, { description: e.target.value })}
-                        placeholder="e.g. GPA 3.9, Courses in AI, President of Hackers club..."
-                        rows={3}
-                        className="w-full px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })
-        )}
-      </div>
+      {state.education.length > 1 && (
+        <p className="text-[11px] text-zinc-400 dark:text-zinc-500 flex items-center gap-1.5">
+          <GripVertical className="h-3 w-3 shrink-0" />
+          Drag the grip handle on any education card to reorder it.
+        </p>
+      )}
     </div>
   );
 }
@@ -940,10 +1093,7 @@ function ProjectsForm() {
     state.projects[0]?.id || null
   );
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
-  );
+  const sensors = useSharedSensors();
 
   const toggleExpand = (id: string) => {
     setExpandedId((prev) => (prev === id ? null : id));
@@ -954,17 +1104,9 @@ function ProjectsForm() {
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
-
-    const oldIndex = state.projects.findIndex((p) => p.id === active.id);
-    const newIndex = state.projects.findIndex((p) => p.id === over.id);
-    if (oldIndex !== -1 && newIndex !== -1) {
-      dispatch({
-        type: "REORDER_PROJECT",
-        payload: arrayMove(state.projects, oldIndex, newIndex),
-      });
-    }
+    handleDragEndHelper(event, state.projects, (reordered) => {
+      dispatch({ type: "REORDER_PROJECT", payload: reordered });
+    });
   };
 
   const projectIds = state.projects.map((p) => p.id);
@@ -1031,12 +1173,94 @@ function ProjectsForm() {
   );
 }
 
+interface SortableSkillCardProps {
+  skill: SkillCategory;
+  onUpdate: (id: string, data: Partial<SkillCategory>) => void;
+  onDelete: (id: string) => void;
+}
+
+function SortableSkillCard({ skill, onUpdate, onDelete }: SortableSkillCardProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: skill.id });
+
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 50 : "auto",
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="flex flex-col md:flex-row items-start gap-4 p-4 border border-zinc-200 dark:border-zinc-800 bg-zinc-50/20 dark:bg-zinc-900/10 rounded-lg hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
+    >
+      <button
+        {...attributes}
+        {...listeners}
+        className="p-1 mr-1 mt-6 text-zinc-300 hover:text-orange-400 rounded cursor-grab active:cursor-grabbing transition-colors shrink-0"
+        title="Drag to reorder"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <GripVertical className="h-4 w-4" />
+      </button>
+
+      <div className="w-full md:w-1/3 space-y-1">
+        <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-wide">Category Name</label>
+        <input
+          type="text"
+          value={skill.name}
+          onChange={(e) => onUpdate(skill.id, { name: e.target.value })}
+          placeholder="e.g. Libraries & APIs"
+          className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200 font-medium"
+        />
+      </div>
+      <div className="w-full md:w-2/3 space-y-1 flex items-end gap-2">
+        <div className="flex-1 space-y-1">
+          <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-wide">Skills (comma-separated)</label>
+          <input
+            type="text"
+            value={skill.skills}
+            onChange={(e) => onUpdate(skill.id, { skills: e.target.value })}
+            placeholder="e.g. React, Next.js, Redux, Tailwind"
+            className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
+          />
+        </div>
+        <button
+          onClick={() => onDelete(skill.id)}
+          className="p-2 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-md transition-colors cursor-pointer shrink-0"
+          title="Delete Category"
+        >
+          <Trash2 className="h-4.5 w-4.5" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function SkillsForm() {
   const { state, dispatch } = useResume();
+
+  const sensors = useSharedSensors();
 
   const updateItem = (id: string, data: Partial<SkillCategory>) => {
     dispatch({ type: "UPDATE_SKILL", payload: { id, data } });
   };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    handleDragEndHelper(event, state.skills, (reordered) => {
+      dispatch({ type: "REORDER_SKILL", payload: reordered });
+    });
+  };
+
+  const skillIds = state.skills.map((s) => s.id);
 
   return (
     <div className="space-y-6">
@@ -1054,50 +1278,108 @@ function SkillsForm() {
         </button>
       </div>
 
-      <div className="space-y-4">
-        {state.skills.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-8 px-4 border border-dashed border-orange-100 dark:border-zinc-800 rounded-lg text-zinc-400 dark:text-zinc-500 text-sm">
-            No skills added yet. Click "Add Category" to begin.
-          </div>
-        ) : (
-          state.skills.map((skill, idx) => (
-            <div
-              key={skill.id}
-              className="flex flex-col md:flex-row items-start gap-4 p-4 border border-zinc-200 dark:border-zinc-800 bg-zinc-50/20 dark:bg-zinc-900/10 rounded-lg hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
-            >
-              <div className="w-full md:w-1/3 space-y-1">
-                <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-wide">Category Name</label>
-                <input
-                  type="text"
-                  value={skill.name}
-                  onChange={(e) => updateItem(skill.id, { name: e.target.value })}
-                  placeholder="e.g. Libraries & APIs"
-                  className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200 font-medium"
+      {state.skills.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-8 px-4 border border-dashed border-orange-100 dark:border-zinc-800 rounded-lg text-zinc-400 dark:text-zinc-500 text-sm">
+          No skills added yet. Click "Add Category" to begin.
+        </div>
+      ) : (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          modifiers={[restrictToVerticalAxis]}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext items={skillIds} strategy={verticalListSortingStrategy}>
+            <div className="space-y-4">
+              {state.skills.map((skill) => (
+                <SortableSkillCard
+                  key={skill.id}
+                  skill={skill}
+                  onUpdate={updateItem}
+                  onDelete={(id) => dispatch({ type: "DELETE_SKILL", payload: id })}
                 />
-              </div>
-              <div className="w-full md:w-2/3 space-y-1 flex items-end gap-2">
-                <div className="flex-1 space-y-1">
-                  <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-wide">Skills (comma-separated)</label>
-                  <input
-                    type="text"
-                    value={skill.skills}
-                    onChange={(e) => updateItem(skill.id, { skills: e.target.value })}
-                    placeholder="e.g. React, Next.js, Redux, Tailwind"
-                    className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
-                  />
-                </div>
-                <button
-                  onClick={() => dispatch({ type: "DELETE_SKILL", payload: skill.id })}
-                  className="p-2 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-md transition-colors cursor-pointer shrink-0"
-                  title="Delete Category"
-                >
-                  <Trash2 className="h-4.5 w-4.5" />
-                </button>
-              </div>
+              ))}
             </div>
-          ))
-        )}
+          </SortableContext>
+        </DndContext>
+      )}
+
+      {state.skills.length > 1 && (
+        <p className="text-[11px] text-zinc-400 dark:text-zinc-500 flex items-center gap-1.5">
+          <GripVertical className="h-3 w-3 shrink-0" />
+          Drag the grip handle on any skills card to reorder it.
+        </p>
+      )}
+    </div>
+  );
+}
+
+interface SortableLanguageCardProps {
+  lang: Language;
+  onUpdate: (id: string, data: Partial<Language>) => void;
+  onDelete: (id: string) => void;
+}
+
+function SortableLanguageCard({ lang, onUpdate, onDelete }: SortableLanguageCardProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: lang.id });
+
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 50 : "auto",
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="flex items-center gap-3 p-3 border border-zinc-200 dark:border-zinc-800 bg-zinc-50/20 dark:bg-zinc-900/10 rounded-lg hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
+    >
+      <button
+        {...attributes}
+        {...listeners}
+        className="p-1 text-zinc-300 hover:text-orange-400 rounded cursor-grab active:cursor-grabbing transition-colors shrink-0"
+        title="Drag to reorder"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <GripVertical className="h-4 w-4" />
+      </button>
+
+      <div className="flex-1 grid grid-cols-2 gap-3">
+        <input
+          type="text"
+          value={lang.name}
+          onChange={(e) => onUpdate(lang.id, { name: e.target.value })}
+          placeholder="e.g. English"
+          className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
+        />
+        <select
+          value={lang.proficiency}
+          onChange={(e) => onUpdate(lang.id, { proficiency: e.target.value })}
+          className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
+        >
+          <option value="">Select Proficiency</option>
+          <option value="Native">Native</option>
+          <option value="Fluent">Fluent</option>
+          <option value="Professional">Professional</option>
+          <option value="Conversational">Conversational</option>
+          <option value="Beginner">Beginner</option>
+        </select>
       </div>
+      <button
+        onClick={() => onDelete(lang.id)}
+        className="p-1.5 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-md transition-colors cursor-pointer shrink-0"
+      >
+        <Trash2 className="h-4.5 w-4.5" />
+      </button>
     </div>
   );
 }
@@ -1105,9 +1387,19 @@ function SkillsForm() {
 function LanguagesForm() {
   const { state, dispatch } = useResume();
 
+  const sensors = useSharedSensors();
+
   const updateItem = (id: string, data: Partial<Language>) => {
     dispatch({ type: "UPDATE_LANGUAGE", payload: { id, data } });
   };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    handleDragEndHelper(event, state.languages, (reordered) => {
+      dispatch({ type: "REORDER_LANGUAGE", payload: reordered });
+    });
+  };
+
+  const languageIds = state.languages.map((l) => l.id);
 
   return (
     <div className="space-y-6">
@@ -1125,48 +1417,110 @@ function LanguagesForm() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 gap-3">
-        {state.languages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-8 px-4 border border-dashed border-orange-100 dark:border-zinc-800 rounded-lg text-zinc-400 dark:text-zinc-500 text-sm">
-            No languages added yet. Click "Add Language" to begin.
-          </div>
-        ) : (
-          state.languages.map((lang) => (
-            <div
-              key={lang.id}
-              className="flex items-center gap-3 p-3 border border-zinc-200 dark:border-zinc-800 bg-zinc-50/20 dark:bg-zinc-900/10 rounded-lg hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
-            >
-              <div className="flex-1 grid grid-cols-2 gap-3">
-                <input
-                  type="text"
-                  value={lang.name}
-                  onChange={(e) => updateItem(lang.id, { name: e.target.value })}
-                  placeholder="e.g. English"
-                  className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
+      {state.languages.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-8 px-4 border border-dashed border-orange-100 dark:border-zinc-800 rounded-lg text-zinc-400 dark:text-zinc-500 text-sm">
+          No languages added yet. Click "Add Language" to begin.
+        </div>
+      ) : (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          modifiers={[restrictToVerticalAxis]}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext items={languageIds} strategy={verticalListSortingStrategy}>
+            <div className="grid grid-cols-1 gap-3">
+              {state.languages.map((lang) => (
+                <SortableLanguageCard
+                  key={lang.id}
+                  lang={lang}
+                  onUpdate={updateItem}
+                  onDelete={(id) => dispatch({ type: "DELETE_LANGUAGE", payload: id })}
                 />
-                <select
-                  value={lang.proficiency}
-                  onChange={(e) => updateItem(lang.id, { proficiency: e.target.value })}
-                  className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
-                >
-                  <option value="">Select Proficiency</option>
-                  <option value="Native">Native</option>
-                  <option value="Fluent">Fluent</option>
-                  <option value="Professional">Professional</option>
-                  <option value="Conversational">Conversational</option>
-                  <option value="Beginner">Beginner</option>
-                </select>
-              </div>
-              <button
-                onClick={() => dispatch({ type: "DELETE_LANGUAGE", payload: lang.id })}
-                className="p-1.5 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-md transition-colors cursor-pointer shrink-0"
-              >
-                <Trash2 className="h-4.5 w-4.5" />
-              </button>
+              ))}
             </div>
-          ))
-        )}
+          </SortableContext>
+        </DndContext>
+      )}
+
+      {state.languages.length > 1 && (
+        <p className="text-[11px] text-zinc-400 dark:text-zinc-500 flex items-center gap-1.5">
+          <GripVertical className="h-3 w-3 shrink-0" />
+          Drag the grip handle on any language card to reorder it.
+        </p>
+      )}
+    </div>
+  );
+}
+
+interface SortableCertificationCardProps {
+  cert: Certification;
+  onUpdate: (id: string, data: Partial<Certification>) => void;
+  onDelete: (id: string) => void;
+}
+
+function SortableCertificationCard({ cert, onUpdate, onDelete }: SortableCertificationCardProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: cert.id });
+
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 50 : "auto",
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="flex items-start md:items-center gap-3 p-3 border border-zinc-200 dark:border-zinc-800 bg-zinc-50/20 dark:bg-zinc-900/10 rounded-lg hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
+    >
+      <button
+        {...attributes}
+        {...listeners}
+        className="p-1 mt-1.5 md:mt-0 text-zinc-300 hover:text-orange-400 rounded cursor-grab active:cursor-grabbing transition-colors shrink-0"
+        title="Drag to reorder"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <GripVertical className="h-4 w-4" />
+      </button>
+
+      <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-3">
+        <input
+          type="text"
+          value={cert.name}
+          onChange={(e) => onUpdate(cert.id, { name: e.target.value })}
+          placeholder="e.g. AWS Certified Architect"
+          className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
+        />
+        <input
+          type="text"
+          value={cert.issuer}
+          onChange={(e) => onUpdate(cert.id, { issuer: e.target.value })}
+          placeholder="e.g. Amazon Web Services"
+          className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
+        />
+        <input
+          type="text"
+          value={cert.date}
+          onChange={(e) => onUpdate(cert.id, { date: e.target.value })}
+          placeholder="e.g. 2025"
+          className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
+        />
       </div>
+      <button
+        onClick={() => onDelete(cert.id)}
+        className="p-1.5 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-md transition-colors cursor-pointer shrink-0"
+      >
+        <Trash2 className="h-4.5 w-4.5" />
+      </button>
     </div>
   );
 }
@@ -1174,9 +1528,19 @@ function LanguagesForm() {
 function CertificationsForm() {
   const { state, dispatch } = useResume();
 
+  const sensors = useSharedSensors();
+
   const updateItem = (id: string, data: Partial<Certification>) => {
     dispatch({ type: "UPDATE_CERTIFICATION", payload: { id, data } });
   };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    handleDragEndHelper(event, state.certifications, (reordered) => {
+      dispatch({ type: "REORDER_CERTIFICATION", payload: reordered });
+    });
+  };
+
+  const certificationIds = state.certifications.map((c) => c.id);
 
   return (
     <div className="space-y-6">
@@ -1194,50 +1558,38 @@ function CertificationsForm() {
         </button>
       </div>
 
-      <div className="space-y-3">
-        {state.certifications.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-8 px-4 border border-dashed border-orange-100 dark:border-zinc-800 rounded-lg text-zinc-400 dark:text-zinc-500 text-sm">
-            No certifications added yet. Click "Add Entry" to begin.
-          </div>
-        ) : (
-          state.certifications.map((cert) => (
-            <div
-              key={cert.id}
-              className="flex items-start md:items-center gap-3 p-3 border border-zinc-200 dark:border-zinc-800 bg-zinc-50/20 dark:bg-zinc-900/10 rounded-lg hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
-            >
-              <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-3">
-                <input
-                  type="text"
-                  value={cert.name}
-                  onChange={(e) => updateItem(cert.id, { name: e.target.value })}
-                  placeholder="e.g. AWS Certified Architect"
-                  className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
+      {state.certifications.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-8 px-4 border border-dashed border-orange-100 dark:border-zinc-800 rounded-lg text-zinc-400 dark:text-zinc-500 text-sm">
+          No certifications added yet. Click "Add Entry" to begin.
+        </div>
+      ) : (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          modifiers={[restrictToVerticalAxis]}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext items={certificationIds} strategy={verticalListSortingStrategy}>
+            <div className="space-y-3">
+              {state.certifications.map((cert) => (
+                <SortableCertificationCard
+                  key={cert.id}
+                  cert={cert}
+                  onUpdate={updateItem}
+                  onDelete={(id) => dispatch({ type: "DELETE_CERTIFICATION", payload: id })}
                 />
-                <input
-                  type="text"
-                  value={cert.issuer}
-                  onChange={(e) => updateItem(cert.id, { issuer: e.target.value })}
-                  placeholder="e.g. Amazon Web Services"
-                  className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
-                />
-                <input
-                  type="text"
-                  value={cert.date}
-                  onChange={(e) => updateItem(cert.id, { date: e.target.value })}
-                  placeholder="e.g. 2025"
-                  className="w-full px-3 py-1.5 text-sm border border-zinc-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-orange-200 focus:border-orange-200"
-                />
-              </div>
-              <button
-                onClick={() => dispatch({ type: "DELETE_CERTIFICATION", payload: cert.id })}
-                className="p-1.5 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-md transition-colors cursor-pointer shrink-0"
-              >
-                <Trash2 className="h-4.5 w-4.5" />
-              </button>
+              ))}
             </div>
-          ))
-        )}
-      </div>
+          </SortableContext>
+        </DndContext>
+      )}
+
+      {state.certifications.length > 1 && (
+        <p className="text-[11px] text-zinc-400 dark:text-zinc-500 flex items-center gap-1.5">
+          <GripVertical className="h-3 w-3 shrink-0" />
+          Drag the grip handle on any certification card to reorder it.
+        </p>
+      )}
     </div>
   );
 }
